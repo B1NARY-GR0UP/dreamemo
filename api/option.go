@@ -1,4 +1,4 @@
-package dreamemo
+package api
 
 type Option struct {
 	F func(o *Options)

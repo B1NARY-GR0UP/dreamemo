@@ -18,4 +18,6 @@
 
 User can choose to use these features and the numbers of nodes
 
+TODO: Add an interactive command line to allow the user to select a configuration.
+
 DREAMEMO is a subproject of the [BINARY WEB ECOLOGY](https://github.com/B1NARY-GR0UP)

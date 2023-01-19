@@ -1,10 +1,10 @@
-package cache
+package strategy
 
 import "sort"
 
-type LFUCache struct {
-	Cache
-	cache    map[Key]LFUEntity
+type LFUCore struct {
+	Core
+	store    map[Key]LFUEntity
 	entities Entities
 }
 
@@ -16,25 +16,25 @@ type (
 	Entities []LFUEntity
 )
 
-// NewLFU will new a cache object based on LFU algorithm
+// NewLFU will new a strategy object based on LFU algorithm
 // TODO: use functional option pattern?
-func NewLFU(maxSize int, onEvicted EvictFunc) *LFUCache {
-	return &LFUCache{
-		Cache: Cache{
+func NewLFU(maxSize int, onEvicted EvictFunc) *LFUCore {
+	return &LFUCore{
+		Core: Core{
 			MaxSize:   maxSize,
 			OnEvicted: onEvicted,
 		},
-		cache:    make(map[Key]LFUEntity),
+		store:    make(map[Key]LFUEntity),
 		entities: make(Entities, 0),
 	}
 }
 
-func (c *LFUCache) Add(key Key, value Value) {
-	if c.cache == nil {
-		c.cache = make(map[Key]LFUEntity)
+func (c *LFUCore) Add(key Key, value Value) {
+	if c.store == nil {
+		c.store = make(map[Key]LFUEntity)
 		c.entities = make(Entities, 0)
 	}
-	if e, ok := c.cache[key]; ok {
+	if e, ok := c.store[key]; ok {
 		e.frequency++
 		e.Value = value
 		return
@@ -46,36 +46,36 @@ func (c *LFUCache) Add(key Key, value Value) {
 		},
 		frequency: 1,
 	}
-	c.cache[key] = entity
+	c.store[key] = entity
 	c.entities = append(c.entities, entity)
 	for c.MaxSize != 0 && c.MaxSize < c.UsedSize {
 		c.RemoveLowFrequency(key)
 	}
 }
 
-func (c *LFUCache) Get(key Key) (Value, bool) {
-	if c.cache == nil {
+func (c *LFUCore) Get(key Key) (Value, bool) {
+	if c.store == nil {
 		return nil, false
 	}
-	if e, ok := c.cache[key]; ok {
+	if e, ok := c.store[key]; ok {
 		e.frequency++
 		return e.Value, true
 	}
 	return nil, false
 }
 
-func (c *LFUCache) Remove(key Key) {
-	if c.cache == nil {
+func (c *LFUCore) Remove(key Key) {
+	if c.store == nil {
 		return
 	}
-	if e, ok := c.cache[key]; ok {
+	if e, ok := c.store[key]; ok {
 		for i, entity := range c.entities {
 			if entity.Key == key {
 				copy(c.entities[i:], c.entities[i+1:])
 				c.entities = c.entities[:len(c.entities)-1]
 			}
 		}
-		delete(c.cache, key)
+		delete(c.store, key)
 		c.UsedSize--
 		if c.UsedSize < 0 {
 			panic("UsedSize must greater than or equal to 0")
@@ -86,14 +86,14 @@ func (c *LFUCache) Remove(key Key) {
 	}
 }
 
-func (c *LFUCache) RemoveLowFrequency(key Key) {
-	if c.cache == nil {
+func (c *LFUCore) RemoveLowFrequency(key Key) {
+	if c.store == nil {
 		return
 	}
 	sort.Sort(c.entities)
 	removedEntity := c.entities[0]
 	c.entities = c.entities[1:]
-	delete(c.cache, key)
+	delete(c.store, key)
 	c.UsedSize--
 	if c.UsedSize < 0 {
 		panic("UsedSize must greater than or equal to 0")
@@ -103,14 +103,14 @@ func (c *LFUCache) RemoveLowFrequency(key Key) {
 	}
 }
 
-func (c *LFUCache) Clear() {
+func (c *LFUCore) Clear() {
 	if c.OnEvicted != nil {
-		for _, e := range c.cache {
+		for _, e := range c.store {
 			c.OnEvicted(e.Key, e.Value)
 		}
 	}
 	c.entities = nil
-	c.cache = nil
+	c.store = nil
 	c.UsedSize = 0
 }
 

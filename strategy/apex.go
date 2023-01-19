@@ -1,7 +1,7 @@
-package cache
+package strategy
 
-// Operation defines allowed options to cache
-type Operation interface {
+// Memo defines allowed options to strategy
+type Memo interface {
 	Add(Key, Value)
 	Get(Key) (Value, bool)
 	Remove(Key)
@@ -9,8 +9,8 @@ type Operation interface {
 }
 
 type (
-	Cache struct {
-		// MaxSize is the max numbers of entries the cache can take
+	Core struct {
+		// MaxSize is the max numbers of entries the strategy can take
 		// Zero means no limit
 		MaxSize   int
 		UsedSize  int
