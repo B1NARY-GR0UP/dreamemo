@@ -2,6 +2,7 @@ package memo
 
 import "github.com/B1NARY-GR0UP/dreamemo/util"
 
+// ByteView data will store in ByteView form
 type ByteView struct {
 	B []byte
 	// TODO: decide Add s string field
