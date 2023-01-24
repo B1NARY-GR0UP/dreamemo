@@ -1,7 +1,7 @@
 package memo
 
 import (
-	"github.com/B1NARY-GR0UP/dreamemo/strategy"
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"sync"
 )
@@ -10,11 +10,11 @@ import (
 // Memo is an encapsulation of the strategy layer
 type Memo struct {
 	sync.RWMutex
-	memo strategy.Memo
+	memo eliminate.Memo
 }
 
 // Add to strategy.Memo
-func (m *Memo) Add(key strategy.Key, value ByteView) {
+func (m *Memo) Add(key eliminate.Key, value ByteView) {
 	m.Lock()
 	defer m.Unlock()
 	// TODO: 这里需要做类型判断（使用 Option 或者其他形式来获取使用的 CoreMemo 类型）
@@ -23,7 +23,7 @@ func (m *Memo) Add(key strategy.Key, value ByteView) {
 }
 
 // Get from strategy.Memo
-func (m *Memo) Get(key strategy.Key) (ByteView, bool) {
+func (m *Memo) Get(key eliminate.Key) (ByteView, bool) {
 	m.RLock()
 	defer m.RUnlock()
 	if m.memo == nil {
@@ -37,7 +37,7 @@ func (m *Memo) Get(key strategy.Key) (ByteView, bool) {
 }
 
 // Remove memo entity
-func (m *Memo) Remove(key strategy.Key) {
+func (m *Memo) Remove(key eliminate.Key) {
 	// TODO: api layer should ensure that the key must not be null
 	m.Lock()
 	defer m.Unlock()

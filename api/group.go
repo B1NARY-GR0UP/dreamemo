@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
-	"github.com/B1NARY-GR0UP/dreamemo/strategy"
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/dreamemo/util"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"sync"
@@ -55,7 +55,7 @@ func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 	if key == "" {
 		return memo.ByteView{}, fmt.Errorf("key is null")
 	}
-	if v, ok := g.memo.Get(strategy.Key(key)); ok {
+	if v, ok := g.memo.Get(eliminate.Key(key)); ok {
 		core.Info("memo hit")
 		return v, nil
 	}
@@ -82,5 +82,5 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 
 func (g *Group) populateMemo(key string, value memo.ByteView) {
 	// TODO: refer to groupcache to improve logic
-	g.memo.Add(strategy.Key(key), value)
+	g.memo.Add(eliminate.Key(key), value)
 }

@@ -1,38 +1,41 @@
-package strategy
+package lru
 
-import "container/list"
+import (
+	"container/list"
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
+)
 
 // LRUCore is not safe under concurrent scene
 type LRUCore struct {
-	Core
-	store map[Key]*list.Element
+	eliminate.Core
+	store map[eliminate.Key]*list.Element
 	list  *list.List
 }
 
 // NewLRU will new a strategy object based on LRU algorithm
 // TODO: use functional option pattern?
-func NewLRU(maxSize int, onEvicted EvictFunc) *LRUCore {
+func NewLRU(maxSize int, onEvicted eliminate.EvictFunc) *LRUCore {
 	return &LRUCore{
-		Core: Core{
+		Core: eliminate.Core{
 			MaxSize:   maxSize,
 			OnEvicted: onEvicted,
 		},
-		store: make(map[Key]*list.Element),
+		store: make(map[eliminate.Key]*list.Element),
 		list:  list.New(),
 	}
 }
 
-func (c *LRUCore) Add(key Key, value Value) {
+func (c *LRUCore) Add(key eliminate.Key, value eliminate.Value) {
 	if c.store == nil {
-		c.store = make(map[Key]*list.Element)
+		c.store = make(map[eliminate.Key]*list.Element)
 		c.list = list.New()
 	}
 	if ele, ok := c.store[key]; ok {
 		c.list.MoveToFront(ele)
-		ele.Value.(*Entity).Value = value
+		ele.Value.(*eliminate.Entity).Value = value
 		return
 	}
-	ele := c.list.PushFront(&Entity{
+	ele := c.list.PushFront(&eliminate.Entity{
 		Key:   key,
 		Value: value,
 	})
@@ -43,18 +46,18 @@ func (c *LRUCore) Add(key Key, value Value) {
 	}
 }
 
-func (c *LRUCore) Get(key Key) (Value, bool) {
+func (c *LRUCore) Get(key eliminate.Key) (eliminate.Value, bool) {
 	if c.store == nil {
 		return nil, false
 	}
 	if ele, ok := c.store[key]; ok {
 		c.list.MoveToFront(ele)
-		return ele.Value.(*Entity).Value, true
+		return ele.Value.(*eliminate.Entity).Value, true
 	}
 	return nil, false
 }
 
-func (c *LRUCore) Remove(key Key) {
+func (c *LRUCore) Remove(key eliminate.Key) {
 	if c.store == nil {
 		return
 	}
@@ -66,13 +69,17 @@ func (c *LRUCore) Remove(key Key) {
 func (c *LRUCore) Clear() {
 	if c.OnEvicted != nil {
 		for _, ele := range c.store {
-			entity := ele.Value.(*Entity)
+			entity := ele.Value.(*eliminate.Entity)
 			c.OnEvicted(entity.Key, entity.Value)
 		}
 	}
 	c.list = nil
 	c.store = nil
 	c.UsedSize = 0
+}
+
+func (c *LRUCore) Name() string {
+	return "lru"
 }
 
 func (c *LRUCore) RemoveOldest() {
@@ -87,7 +94,7 @@ func (c *LRUCore) RemoveOldest() {
 
 func (c *LRUCore) removeElement(ele *list.Element) {
 	c.list.Remove(ele)
-	entry := ele.Value.(*Entity)
+	entry := ele.Value.(*eliminate.Entity)
 	delete(c.store, entry.Key)
 	c.UsedSize--
 	if c.UsedSize < 0 {

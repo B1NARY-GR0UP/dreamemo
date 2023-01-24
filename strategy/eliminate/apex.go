@@ -1,11 +1,12 @@
-package strategy
+package eliminate
 
-// Memo defines allowed options to strategy
+// Memo defines allowed operations of a memo
 type Memo interface {
 	Add(Key, Value)
 	Get(Key) (Value, bool)
 	Remove(Key)
 	Clear()
+	Name() string
 }
 
 type (

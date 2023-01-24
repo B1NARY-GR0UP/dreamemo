@@ -1,16 +1,19 @@
-package strategy
+package lfu
 
-import "sort"
+import (
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
+	"sort"
+)
 
 type LFUCore struct {
-	Core
-	store    map[Key]LFUEntity
+	eliminate.Core
+	store    map[eliminate.Key]LFUEntity
 	entities Entities
 }
 
 type (
 	LFUEntity struct {
-		Entity
+		eliminate.Entity
 		frequency int
 	}
 	Entities []LFUEntity
@@ -18,20 +21,20 @@ type (
 
 // NewLFU will new a strategy object based on LFU algorithm
 // TODO: use functional option pattern?
-func NewLFU(maxSize int, onEvicted EvictFunc) *LFUCore {
+func NewLFU(maxSize int, onEvicted eliminate.EvictFunc) *LFUCore {
 	return &LFUCore{
-		Core: Core{
+		Core: eliminate.Core{
 			MaxSize:   maxSize,
 			OnEvicted: onEvicted,
 		},
-		store:    make(map[Key]LFUEntity),
+		store:    make(map[eliminate.Key]LFUEntity),
 		entities: make(Entities, 0),
 	}
 }
 
-func (c *LFUCore) Add(key Key, value Value) {
+func (c *LFUCore) Add(key eliminate.Key, value eliminate.Value) {
 	if c.store == nil {
-		c.store = make(map[Key]LFUEntity)
+		c.store = make(map[eliminate.Key]LFUEntity)
 		c.entities = make(Entities, 0)
 	}
 	if e, ok := c.store[key]; ok {
@@ -40,7 +43,7 @@ func (c *LFUCore) Add(key Key, value Value) {
 		return
 	}
 	entity := LFUEntity{
-		Entity: Entity{
+		Entity: eliminate.Entity{
 			Key:   key,
 			Value: value,
 		},
@@ -53,7 +56,7 @@ func (c *LFUCore) Add(key Key, value Value) {
 	}
 }
 
-func (c *LFUCore) Get(key Key) (Value, bool) {
+func (c *LFUCore) Get(key eliminate.Key) (eliminate.Value, bool) {
 	if c.store == nil {
 		return nil, false
 	}
@@ -64,7 +67,7 @@ func (c *LFUCore) Get(key Key) (Value, bool) {
 	return nil, false
 }
 
-func (c *LFUCore) Remove(key Key) {
+func (c *LFUCore) Remove(key eliminate.Key) {
 	if c.store == nil {
 		return
 	}
@@ -86,7 +89,7 @@ func (c *LFUCore) Remove(key Key) {
 	}
 }
 
-func (c *LFUCore) RemoveLowFrequency(key Key) {
+func (c *LFUCore) RemoveLowFrequency(key eliminate.Key) {
 	if c.store == nil {
 		return
 	}
@@ -112,6 +115,10 @@ func (c *LFUCore) Clear() {
 	c.entities = nil
 	c.store = nil
 	c.UsedSize = 0
+}
+
+func (c *LFUCore) Name() string {
+	return "lfu"
 }
 
 func (e Entities) Len() int {

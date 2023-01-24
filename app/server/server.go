@@ -34,6 +34,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// TODO: use req.Context() or other context, refer to groupcache
+	// TODO: add context field to Engine, use sync.Pool to optimize
 	byteView, err := matchedGroup.Get(req.Context(), key)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
