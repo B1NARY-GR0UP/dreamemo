@@ -6,7 +6,7 @@ struct GetRequest {
 }
 
 struct GetResponse {
-    1: optional byte value
+    1: optional binary value
     2: optional double qps
 }
 
