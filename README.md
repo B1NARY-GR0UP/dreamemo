@@ -1,6 +1,6 @@
 # DREAMEMO
 
-> Have we ever been sober.
+> You Can (Not) Escape
 
 ## Quick Start
 
