@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package protobuf;
+
+message GetRequest {
+  string group = 1;
+  string key = 2;
+}
+
+message GetResponse {
+  optional bytes value = 1;
+  optional double qps = 2;
+}
+
+service Memo {
+  rpc Get(GetRequest) returns (GetResponse) {};
+}
