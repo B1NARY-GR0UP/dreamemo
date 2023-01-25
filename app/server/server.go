@@ -2,13 +2,18 @@ package server
 
 import (
 	"github.com/B1NARY-GR0UP/dreamemo/api"
+	"github.com/B1NARY-GR0UP/dreamemo/app/client"
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"github.com/B1NARY-GR0UP/dreamemo/util"
 	"net/http"
 )
 
 // Engine TODO: use listenAndServe to start server
 type Engine struct {
+	// TODO: choose lb method according to users option
+	ins     distributed.Instance
 	options *Options
+	clients map[string]*client.Client
 }
 
 func NewEngine(opts ...Option) *Engine {

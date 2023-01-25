@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/B1NARY-GR0UP/dreamemo/common"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/dreamemo/util"
@@ -14,6 +15,7 @@ type Group struct {
 	name   string
 	getter Getter
 	memo   memo.Memo
+	sf     common.SingleFlight
 }
 
 var (
@@ -33,6 +35,7 @@ func NewGroup(name string, getter Getter) *Group {
 		name:   name,
 		getter: getter,
 		memo:   memo.Memo{},
+		sf:     &common.Group{},
 	}
 	groups[name] = g
 	return g
