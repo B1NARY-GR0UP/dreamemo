@@ -1,5 +1,6 @@
 package protocol
 
+// GetRequest TODO: use thrift
 type GetRequest interface {
 	GetGroup() string
 	GetKey() string

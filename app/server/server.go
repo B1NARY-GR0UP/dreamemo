@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/B1NARY-GR0UP/dreamemo/api"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
+	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"github.com/B1NARY-GR0UP/dreamemo/util"
 	"net/http"
@@ -22,6 +23,11 @@ func NewEngine(opts ...Option) *Engine {
 		options: options,
 	}
 	return e
+}
+
+func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
+	//TODO implement me
+	panic("implement me")
 }
 
 // ServeHTTP implements the http.Handler interface
