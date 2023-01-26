@@ -8,8 +8,7 @@ message GetRequest {
 }
 
 message GetResponse {
-  optional bytes value = 1;
-  optional double qps = 2;
+  bytes value = 1;
 }
 
 service Memo {

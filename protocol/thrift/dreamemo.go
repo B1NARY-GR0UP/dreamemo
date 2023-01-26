@@ -174,38 +174,17 @@ func (p *GetRequest) String() string {
 
 // Attributes:
 //   - Value
-//   - QPS
 type GetResponse struct {
-	Value []byte   `thrift:"value,1" db:"value" json:"value,omitempty"`
-	QPS   *float64 `thrift:"qps,2" db:"qps" json:"qps,omitempty"`
+	Value []byte `thrift:"value,1" db:"value" json:"value"`
 }
 
 func NewGetResponse() *GetResponse {
 	return &GetResponse{}
 }
 
-var GetResponse_Value_DEFAULT []byte
-
 func (p *GetResponse) GetValue() []byte {
 	return p.Value
 }
-
-var GetResponse_QPS_DEFAULT float64
-
-func (p *GetResponse) GetQPS() float64 {
-	if !p.IsSetQPS() {
-		return GetResponse_QPS_DEFAULT
-	}
-	return *p.QPS
-}
-func (p *GetResponse) IsSetValue() bool {
-	return p.Value != nil
-}
-
-func (p *GetResponse) IsSetQPS() bool {
-	return p.QPS != nil
-}
-
 func (p *GetResponse) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
@@ -223,16 +202,6 @@ func (p *GetResponse) Read(ctx context.Context, iprot thrift.TProtocol) error {
 		case 1:
 			if fieldTypeId == thrift.STRING {
 				if err := p.ReadField1(ctx, iprot); err != nil {
-					return err
-				}
-			} else {
-				if err := iprot.Skip(ctx, fieldTypeId); err != nil {
-					return err
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.DOUBLE {
-				if err := p.ReadField2(ctx, iprot); err != nil {
 					return err
 				}
 			} else {
@@ -264,24 +233,12 @@ func (p *GetResponse) ReadField1(ctx context.Context, iprot thrift.TProtocol) er
 	return nil
 }
 
-func (p *GetResponse) ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadDouble(ctx); err != nil {
-		return thrift.PrependError("error reading field 2: ", err)
-	} else {
-		p.QPS = &v
-	}
-	return nil
-}
-
 func (p *GetResponse) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin(ctx, "GetResponse"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p != nil {
 		if err := p.writeField1(ctx, oprot); err != nil {
-			return err
-		}
-		if err := p.writeField2(ctx, oprot); err != nil {
 			return err
 		}
 	}
@@ -295,31 +252,14 @@ func (p *GetResponse) Write(ctx context.Context, oprot thrift.TProtocol) error {
 }
 
 func (p *GetResponse) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
-	if p.IsSetValue() {
-		if err := oprot.WriteFieldBegin(ctx, "value", thrift.STRING, 1); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err)
-		}
-		if err := oprot.WriteBinary(ctx, p.Value); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err)
-		}
-		if err := oprot.WriteFieldEnd(ctx); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err)
-		}
+	if err := oprot.WriteFieldBegin(ctx, "value", thrift.STRING, 1); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:value: ", p), err)
 	}
-	return err
-}
-
-func (p *GetResponse) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
-	if p.IsSetQPS() {
-		if err := oprot.WriteFieldBegin(ctx, "qps", thrift.DOUBLE, 2); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:qps: ", p), err)
-		}
-		if err := oprot.WriteDouble(ctx, float64(*p.QPS)); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T.qps (2) field write error: ", p), err)
-		}
-		if err := oprot.WriteFieldEnd(ctx); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T write field end error 2:qps: ", p), err)
-		}
+	if err := oprot.WriteBinary(ctx, p.Value); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T.value (1) field write error: ", p), err)
+	}
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
+		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:value: ", p), err)
 	}
 	return err
 }
@@ -332,14 +272,6 @@ func (p *GetResponse) Equals(other *GetResponse) bool {
 	}
 	if bytes.Compare(p.Value, other.Value) != 0 {
 		return false
-	}
-	if p.QPS != other.QPS {
-		if p.QPS == nil || other.QPS == nil {
-			return false
-		}
-		if (*p.QPS) != (*other.QPS) {
-			return false
-		}
 	}
 	return true
 }

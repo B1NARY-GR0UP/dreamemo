@@ -6,8 +6,7 @@ struct GetRequest {
 }
 
 struct GetResponse {
-    1: optional binary value
-    2: optional double qps
+    1: binary value
 }
 
 service Memo {
