@@ -2,6 +2,12 @@
 
 > You Can (Not) Escape
 
+![]()
+
+## Architecture
+
+![dreamemo-arch](./image/dreamemo-arch.png)
+
 ## Quick Start
 
 - RPC data protocol
