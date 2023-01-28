@@ -3,10 +3,10 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/B1NARY-GR0UP/dreamemo/common"
+	"github.com/B1NARY-GR0UP/dreamemo/common/singleflight"
+	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
-	"github.com/B1NARY-GR0UP/dreamemo/util"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"sync"
 )
@@ -15,7 +15,7 @@ type Group struct {
 	name   string
 	getter Getter
 	memo   memo.Memo
-	sf     common.SingleFlight
+	sf     singleflight.SingleFlight
 }
 
 var (
@@ -35,7 +35,7 @@ func NewGroup(name string, getter Getter) *Group {
 		name:   name,
 		getter: getter,
 		memo:   memo.Memo{},
-		sf:     &common.Group{},
+		sf:     &singleflight.Group{},
 	}
 	groups[name] = g
 	return g

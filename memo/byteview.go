@@ -1,6 +1,8 @@
 package memo
 
-import "github.com/B1NARY-GR0UP/dreamemo/util"
+import (
+	"github.com/B1NARY-GR0UP/dreamemo/common/util"
+)
 
 // ByteView data will store in ByteView form
 type ByteView struct {

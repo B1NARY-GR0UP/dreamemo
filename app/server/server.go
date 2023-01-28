@@ -3,9 +3,9 @@ package server
 import (
 	"github.com/B1NARY-GR0UP/dreamemo/api"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
+	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
-	"github.com/B1NARY-GR0UP/dreamemo/util"
 	"net/http"
 )
 
