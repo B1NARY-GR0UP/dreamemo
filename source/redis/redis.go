@@ -3,16 +3,31 @@ package redis
 import (
 	"context"
 	"github.com/B1NARY-GR0UP/dreamemo/api"
+	"github.com/redis/go-redis/v9"
 )
 
-var _ api.Getter = (*RedisGetter)(nil)
+var _ api.Getter = (*Source)(nil)
 
-// RedisGetter use redis as datasource
-type RedisGetter struct {
+// Source use redis as datasource
+type Source struct {
+	cli *redis.Client
 }
 
-func (r *RedisGetter) Get(ctx context.Context, key string) ([]byte, error) {
-	// TODO: refer to hertz-contrib/cache
-	// TODO implement me
-	panic("implement me")
+func NewSource(opts ...Option) *Source {
+	redisOpts := &redis.Options{
+		Addr:     ":6379",
+		Password: "",
+		DB:       0,
+	}
+	for _, opt := range opts {
+		opt(redisOpts)
+	}
+	rdb := redis.NewClient(redisOpts)
+	return &Source{
+		cli: rdb,
+	}
+}
+
+func (r *Source) Get(ctx context.Context, key string) ([]byte, error) {
+	return r.cli.Get(ctx, key).Bytes()
 }
