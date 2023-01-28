@@ -18,11 +18,11 @@ DREAMEMO is a distributed cache with out-of-the-box, high-scalability, modular-d
 package main
 
 import (
-	"github.com/B1NARY-GR0UP/dreamemo/dream"
+    "github.com/B1NARY-GR0UP/dreamemo/dream"
 )
 
 func main() {
-	dream.Default()
+    dream.Default()
 }
 ```
 
