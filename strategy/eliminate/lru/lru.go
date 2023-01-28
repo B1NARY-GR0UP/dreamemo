@@ -5,6 +5,8 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 )
 
+var _ eliminate.Memo = (*LRUCore)(nil)
+
 // LRUCore is not safe under concurrent scene
 type LRUCore struct {
 	eliminate.Core

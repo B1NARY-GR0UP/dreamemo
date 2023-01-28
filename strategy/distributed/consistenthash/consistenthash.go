@@ -2,8 +2,11 @@ package consistenthash
 
 import (
 	"fmt"
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"sort"
 )
+
+var _ distributed.Instance = (*Hash)(nil)
 
 type Hash struct {
 	ring    []uint32

@@ -1,20 +1,32 @@
 package server
 
 import (
+	"context"
 	"github.com/B1NARY-GR0UP/dreamemo/api"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"net/http"
+	"sync"
 )
+
+var _ loadbalance.LoadBalancer = (*Engine)(nil)
 
 // Engine TODO: use listenAndServe to start server
 type Engine struct {
 	// TODO: choose lb method according to users option
-	ins     distributed.Instance
+	sync.Mutex
+	// addr of local instance
+	// TODO: 需要在实例化时赋值？？
+	self    string
 	options *Options
-	clients map[string]*client.Client
+	// an instance only holds its addr
+	// TODO: support more field to an instance e.g. tags
+	instances distributed.Instance
+	clients   map[string]*client.Client
+	// TODO: how to use
+	Transport func(context.Context) http.RoundTripper
 }
 
 func NewEngine(opts ...Option) *Engine {
@@ -25,9 +37,33 @@ func NewEngine(opts ...Option) *Engine {
 	return e
 }
 
+// Set instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
+func (e *Engine) Set(instances ...string) {
+	e.Lock()
+	defer e.Unlock()
+	// TODO: decide to use which kind of distributed strategy according to the option
+	e.instances.Add(instances...)
+	e.clients = make(map[string]*client.Client, len(instances))
+	for _, instance := range instances {
+		e.clients[instance] = &client.Client{
+			BasePath:  instance + e.options.BasePath,
+			Transport: e.Transport,
+		}
+	}
+}
+
+// Pick an instance according to the given key
 func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
-	//TODO implement me
-	panic("implement me")
+	e.Lock()
+	defer e.Unlock()
+	ins := e.instances.Get(key)
+	if ins == "" {
+		return nil, false
+	}
+	if ins != e.self {
+		return e.clients[ins], true
+	}
+	return nil, false
 }
 
 // ServeHTTP implements the http.Handler interface

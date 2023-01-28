@@ -5,6 +5,8 @@ import (
 	"sort"
 )
 
+var _ eliminate.Memo = (*LFUCore)(nil)
+
 type LFUCore struct {
 	eliminate.Core
 	store    map[eliminate.Key]LFUEntity

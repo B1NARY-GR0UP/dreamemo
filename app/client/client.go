@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
 	"google.golang.org/protobuf/proto"
 	"io"
@@ -12,11 +13,13 @@ import (
 	"sync"
 )
 
+var _ loadbalance.Instance = (*Client)(nil)
+
 const HTTPRequestMethod = "GET"
 
 type Client struct {
-	basePath  string
-	transport func(context.Context) http.RoundTripper
+	BasePath  string
+	Transport func(context.Context) http.RoundTripper
 }
 
 var defaultBufferPool = sync.Pool{
@@ -26,18 +29,18 @@ var defaultBufferPool = sync.Pool{
 }
 
 func (c *Client) Get(ctx context.Context, in *protobuf.GetRequest, out *protobuf.GetResponse) error {
-	requestURL := fmt.Sprintf("%v%v/%v", c.basePath, url.QueryEscape(in.GetGroup()), url.QueryEscape(in.GetKey()))
+	requestURL := fmt.Sprintf("%v%v/%v", c.BasePath, url.QueryEscape(in.GetGroup()), url.QueryEscape(in.GetKey()))
 	req, err := http.NewRequest(HTTPRequestMethod, requestURL, nil)
 	if err != nil {
 		return err
 	}
 	req = req.WithContext(ctx)
 	tpt := http.DefaultTransport
-	if c.transport != nil {
-		tpt = c.transport(ctx)
+	if c.Transport != nil {
+		tpt = c.Transport(ctx)
 	}
 	resp, err := tpt.RoundTrip(req)
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint:errcheck
 	if err != nil {
 		return err
 	}

@@ -18,10 +18,12 @@ type Group struct {
 	sf     singleflight.SingleFlight
 }
 
-var (
-	mu     sync.RWMutex
-	groups = make(map[string]*Group)
-)
+var syncGroups = struct {
+	sync.RWMutex
+	groups map[string]*Group
+}{
+	groups: make(map[string]*Group),
+}
 
 // NewGroup
 // TODO: add cacheBytes; related to lazy init todo
@@ -29,23 +31,23 @@ func NewGroup(name string, getter Getter) *Group {
 	if getter == nil {
 		panic("Getter must not be nil")
 	}
-	mu.Lock()
-	defer mu.Unlock()
+	syncGroups.Lock()
+	defer syncGroups.Unlock()
 	g := &Group{
 		name:   name,
 		getter: getter,
 		memo:   memo.Memo{},
 		sf:     &singleflight.Group{},
 	}
-	groups[name] = g
+	syncGroups.groups[name] = g
 	return g
 }
 
 // GetGroup return correspond group related to the name
 func GetGroup(name string) *Group {
-	mu.RLock()
-	defer mu.RUnlock()
-	return groups[name]
+	syncGroups.RLock()
+	defer syncGroups.RUnlock()
+	return syncGroups.groups[name]
 }
 
 func (g *Group) Name() string {
