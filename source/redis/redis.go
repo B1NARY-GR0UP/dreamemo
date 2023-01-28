@@ -2,11 +2,11 @@ package redis
 
 import (
 	"context"
-	"github.com/B1NARY-GR0UP/dreamemo/api"
+	"github.com/B1NARY-GR0UP/dreamemo/source"
 	"github.com/redis/go-redis/v9"
 )
 
-var _ api.Getter = (*Source)(nil)
+var _ source.Getter = (*Source)(nil)
 
 // Source use redis as datasource
 type Source struct {

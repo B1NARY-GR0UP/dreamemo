@@ -5,38 +5,38 @@ import (
 	"sort"
 )
 
-var _ eliminate.Memo = (*LFUCore)(nil)
+var _ eliminate.ICore = (*Core)(nil)
 
-type LFUCore struct {
+type Core struct {
 	eliminate.Core
-	store    map[eliminate.Key]LFUEntity
+	store    map[eliminate.Key]Entity
 	entities Entities
 }
 
 type (
-	LFUEntity struct {
+	Entity struct {
 		eliminate.Entity
 		frequency int
 	}
-	Entities []LFUEntity
+	Entities []Entity
 )
 
-// NewLFU will new a strategy object based on LFU algorithm
+// NewLFUCore will new a strategy object based on LFU algorithm
 // TODO: use functional option pattern?
-func NewLFU(maxSize int, onEvicted eliminate.EvictFunc) *LFUCore {
-	return &LFUCore{
+func NewLFUCore(maxSize int, onEvicted eliminate.EvictFunc) *Core {
+	return &Core{
 		Core: eliminate.Core{
 			MaxSize:   maxSize,
 			OnEvicted: onEvicted,
 		},
-		store:    make(map[eliminate.Key]LFUEntity),
+		store:    make(map[eliminate.Key]Entity),
 		entities: make(Entities, 0),
 	}
 }
 
-func (c *LFUCore) Add(key eliminate.Key, value eliminate.Value) {
+func (c *Core) Add(key eliminate.Key, value eliminate.Value) {
 	if c.store == nil {
-		c.store = make(map[eliminate.Key]LFUEntity)
+		c.store = make(map[eliminate.Key]Entity)
 		c.entities = make(Entities, 0)
 	}
 	if e, ok := c.store[key]; ok {
@@ -44,7 +44,7 @@ func (c *LFUCore) Add(key eliminate.Key, value eliminate.Value) {
 		e.Value = value
 		return
 	}
-	entity := LFUEntity{
+	entity := Entity{
 		Entity: eliminate.Entity{
 			Key:   key,
 			Value: value,
@@ -58,7 +58,7 @@ func (c *LFUCore) Add(key eliminate.Key, value eliminate.Value) {
 	}
 }
 
-func (c *LFUCore) Get(key eliminate.Key) (eliminate.Value, bool) {
+func (c *Core) Get(key eliminate.Key) (eliminate.Value, bool) {
 	if c.store == nil {
 		return nil, false
 	}
@@ -69,7 +69,7 @@ func (c *LFUCore) Get(key eliminate.Key) (eliminate.Value, bool) {
 	return nil, false
 }
 
-func (c *LFUCore) Remove(key eliminate.Key) {
+func (c *Core) Remove(key eliminate.Key) {
 	if c.store == nil {
 		return
 	}
@@ -91,7 +91,7 @@ func (c *LFUCore) Remove(key eliminate.Key) {
 	}
 }
 
-func (c *LFUCore) RemoveLowFrequency(key eliminate.Key) {
+func (c *Core) RemoveLowFrequency(key eliminate.Key) {
 	if c.store == nil {
 		return
 	}
@@ -108,7 +108,7 @@ func (c *LFUCore) RemoveLowFrequency(key eliminate.Key) {
 	}
 }
 
-func (c *LFUCore) Clear() {
+func (c *Core) Clear() {
 	if c.OnEvicted != nil {
 		for _, e := range c.store {
 			c.OnEvicted(e.Key, e.Value)
@@ -119,7 +119,7 @@ func (c *LFUCore) Clear() {
 	c.UsedSize = 0
 }
 
-func (c *LFUCore) Name() string {
+func (c *Core) Name() string {
 	return "lfu"
 }
 

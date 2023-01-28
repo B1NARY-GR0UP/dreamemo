@@ -1,7 +1,7 @@
 package eliminate
 
-// Memo defines allowed operations of a memo
-type Memo interface {
+// ICore defines allowed operations of a memo
+type ICore interface {
 	Add(Key, Value)
 	Get(Key) (Value, bool)
 	Remove(Key)

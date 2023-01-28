@@ -1,4 +1,4 @@
-package api
+package dream
 
 const (
 	// protocol config

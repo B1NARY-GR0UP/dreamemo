@@ -1,4 +1,4 @@
-package api
+package guidance
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
 	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
+	"github.com/B1NARY-GR0UP/dreamemo/source"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"sync"
@@ -15,8 +16,8 @@ import (
 
 type Group struct {
 	name   string
-	getter Getter
-	memo   memo.Memo
+	getter source.Getter
+	memo   *memo.Memo
 	lbr    loadbalance.LoadBalancer
 	sf     singleflight.SingleFlight
 }
@@ -30,7 +31,7 @@ var syncGroups = struct {
 
 // NewGroup
 // TODO: add cacheBytes; related to lazy init todo
-func NewGroup(name string, getter Getter) *Group {
+func NewGroup(memo *memo.Memo, name string, getter source.Getter) *Group {
 	if getter == nil {
 		panic("Getter must not be nil")
 	}
@@ -39,7 +40,7 @@ func NewGroup(name string, getter Getter) *Group {
 	g := &Group{
 		name:   name,
 		getter: getter,
-		memo:   memo.Memo{},
+		memo:   memo,
 		sf:     &singleflight.Group{},
 		// TODO: initLoadBalancer according to user's options
 	}
@@ -60,19 +61,19 @@ func (g *Group) Name() string {
 
 func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 	// TODO: How to use context
-	// TODO: refer to groupcache to improve logic
+	// TODO: refer to groupcache to improve guidance
 	if key == "" {
 		return memo.ByteView{}, fmt.Errorf("key is null")
 	}
 	if v, ok := g.memo.Get(eliminate.Key(key)); ok {
-		core.Info("[DREAMEMO] Memo Hit")
+		core.Info("[DREAMEMO] ICore Hit")
 		return v, nil
 	}
 	return g.load(ctx, key)
 }
 
 func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
-	// TODO: review logic
+	// TODO: review guidance
 	bv, err := g.sf.Do(key, func() (any, error) {
 		if g.lbr != nil {
 			if ins, ok := g.lbr.Pick(key); ok {
@@ -95,7 +96,7 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 	if err != nil {
 		return memo.ByteView{}, err
 	}
-	// TODO: refer to groupcache to improve logic
+	// TODO: refer to groupcache to improve guidance
 	value := memo.ByteView{
 		B: util.CopyBytes(bytes),
 	}
@@ -120,6 +121,6 @@ func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instan
 }
 
 func (g *Group) populateMemo(key string, value memo.ByteView) {
-	// TODO: refer to groupcache to improve logic
+	// TODO: refer to groupcache to improve guidance
 	g.memo.Add(eliminate.Key(key), value)
 }

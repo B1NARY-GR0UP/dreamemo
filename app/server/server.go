@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
-	"github.com/B1NARY-GR0UP/dreamemo/api"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
+	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"net/http"
@@ -29,7 +29,7 @@ type Engine struct {
 	Transport func(context.Context) http.RoundTripper
 }
 
-func NewEngine(opts ...Option) *Engine {
+func NewEngine(group *guidance.Group, opts ...Option) *Engine {
 	options := NewOptions(opts...)
 	e := &Engine{
 		options: options,
@@ -75,7 +75,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	groupName := segments[0]
 	key := segments[1]
-	matchedGroup := api.GetGroup(groupName)
+	matchedGroup := guidance.GetGroup(groupName)
 	if matchedGroup == nil {
 		http.Error(w, "No Such Group: "+groupName, http.StatusBadRequest)
 		return

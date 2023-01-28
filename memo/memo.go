@@ -6,14 +6,19 @@ import (
 	"sync"
 )
 
-// Memo ensures that all accesses to the core are concurrency safe
+// Memo ensures that all accesses to the guidance are concurrency safe
 // Memo is an encapsulation of the strategy layer
 type Memo struct {
 	sync.RWMutex
-	memo eliminate.Memo
+	memo eliminate.ICore
 }
 
-// Add to strategy.Memo
+// NewMemo TODO:
+func NewMemo(core eliminate.ICore) *Memo {
+	return nil
+}
+
+// Add to strategy.ICore
 func (m *Memo) Add(key eliminate.Key, value ByteView) {
 	m.Lock()
 	defer m.Unlock()
@@ -22,7 +27,7 @@ func (m *Memo) Add(key eliminate.Key, value ByteView) {
 	m.memo.Add(key, value)
 }
 
-// Get from strategy.Memo
+// Get from strategy.ICore
 func (m *Memo) Get(key eliminate.Key) (ByteView, bool) {
 	m.RLock()
 	defer m.RUnlock()
@@ -38,11 +43,11 @@ func (m *Memo) Get(key eliminate.Key) (ByteView, bool) {
 
 // Remove memo entity
 func (m *Memo) Remove(key eliminate.Key) {
-	// TODO: api layer should ensure that the key must not be null
+	// TODO: guidance layer should ensure that the key must not be null
 	m.Lock()
 	defer m.Unlock()
 	if m.memo == nil {
-		core.Info("[DREAMEMO] Memo is Empty")
+		core.Info("[DREAMEMO] ICore is Empty")
 		return
 	}
 	m.memo.Remove(key)
@@ -52,7 +57,7 @@ func (m *Memo) Clear() {
 	m.Lock()
 	defer m.Unlock()
 	if m.memo == nil {
-		core.Info("[DREAMEMO] Memo is Empty")
+		core.Info("[DREAMEMO] ICore is Empty")
 		return
 	}
 	m.memo.Clear()

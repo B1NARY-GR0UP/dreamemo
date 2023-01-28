@@ -5,19 +5,19 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 )
 
-var _ eliminate.Memo = (*LRUCore)(nil)
+var _ eliminate.ICore = (*Core)(nil)
 
-// LRUCore is not safe under concurrent scene
-type LRUCore struct {
+// Core is not safe under concurrent scene
+type Core struct {
 	eliminate.Core
 	store map[eliminate.Key]*list.Element
 	list  *list.List
 }
 
-// NewLRU will new a strategy object based on LRU algorithm
+// NewLRUCore will new a strategy object based on LRU algorithm
 // TODO: use functional option pattern?
-func NewLRU(maxSize int, onEvicted eliminate.EvictFunc) *LRUCore {
-	return &LRUCore{
+func NewLRUCore(maxSize int, onEvicted eliminate.EvictFunc) *Core {
+	return &Core{
 		Core: eliminate.Core{
 			MaxSize:   maxSize,
 			OnEvicted: onEvicted,
@@ -27,7 +27,7 @@ func NewLRU(maxSize int, onEvicted eliminate.EvictFunc) *LRUCore {
 	}
 }
 
-func (c *LRUCore) Add(key eliminate.Key, value eliminate.Value) {
+func (c *Core) Add(key eliminate.Key, value eliminate.Value) {
 	if c.store == nil {
 		c.store = make(map[eliminate.Key]*list.Element)
 		c.list = list.New()
@@ -48,7 +48,7 @@ func (c *LRUCore) Add(key eliminate.Key, value eliminate.Value) {
 	}
 }
 
-func (c *LRUCore) Get(key eliminate.Key) (eliminate.Value, bool) {
+func (c *Core) Get(key eliminate.Key) (eliminate.Value, bool) {
 	if c.store == nil {
 		return nil, false
 	}
@@ -59,7 +59,7 @@ func (c *LRUCore) Get(key eliminate.Key) (eliminate.Value, bool) {
 	return nil, false
 }
 
-func (c *LRUCore) Remove(key eliminate.Key) {
+func (c *Core) Remove(key eliminate.Key) {
 	if c.store == nil {
 		return
 	}
@@ -68,7 +68,7 @@ func (c *LRUCore) Remove(key eliminate.Key) {
 	}
 }
 
-func (c *LRUCore) Clear() {
+func (c *Core) Clear() {
 	if c.OnEvicted != nil {
 		for _, ele := range c.store {
 			entity := ele.Value.(*eliminate.Entity)
@@ -80,11 +80,11 @@ func (c *LRUCore) Clear() {
 	c.UsedSize = 0
 }
 
-func (c *LRUCore) Name() string {
+func (c *Core) Name() string {
 	return "lru"
 }
 
-func (c *LRUCore) RemoveOldest() {
+func (c *Core) RemoveOldest() {
 	if c.store == nil {
 		return
 	}
@@ -94,7 +94,7 @@ func (c *LRUCore) RemoveOldest() {
 	}
 }
 
-func (c *LRUCore) removeElement(ele *list.Element) {
+func (c *Core) removeElement(ele *list.Element) {
 	c.list.Remove(ele)
 	entry := ele.Value.(*eliminate.Entity)
 	delete(c.store, entry.Key)
