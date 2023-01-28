@@ -65,7 +65,7 @@ func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 		return memo.ByteView{}, fmt.Errorf("key is null")
 	}
 	if v, ok := g.memo.Get(eliminate.Key(key)); ok {
-		core.Info("memo hit")
+		core.Info("[DREAMEMO] Memo Hit")
 		return v, nil
 	}
 	return g.load(ctx, key)
@@ -81,6 +81,7 @@ func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 				}
 			}
 		}
+		core.Info("[DREAMEMO] Get Locally")
 		return g.getLocally(ctx, key)
 	})
 	if err != nil {

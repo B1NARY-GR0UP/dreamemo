@@ -42,7 +42,7 @@ func (m *Memo) Remove(key eliminate.Key) {
 	m.Lock()
 	defer m.Unlock()
 	if m.memo == nil {
-		core.Info("Memo is Empty")
+		core.Info("[DREAMEMO] Memo is Empty")
 		return
 	}
 	m.memo.Remove(key)
@@ -52,7 +52,7 @@ func (m *Memo) Clear() {
 	m.Lock()
 	defer m.Unlock()
 	if m.memo == nil {
-		core.Info("Memo is Empty")
+		core.Info("[DREAMEMO] Memo is Empty")
 		return
 	}
 	m.memo.Clear()

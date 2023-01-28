@@ -17,7 +17,7 @@ func CopyBytes(b []byte) []byte {
 // segments[1]: key
 func ParseRequestURL(reqPath, basePath string) []string {
 	if !strings.HasPrefix(reqPath, basePath) {
-		core.Warnf("Request URL is invalid: %v", reqPath)
+		core.Warnf("[DREAMEMO] Request URL is Invalid: %v", reqPath)
 		return nil
 	}
 	idx := strings.LastIndex(reqPath, "/")
@@ -26,7 +26,7 @@ func ParseRequestURL(reqPath, basePath string) []string {
 	}
 	segments := strings.Split(reqPath[len(basePath):], "/")
 	if len(segments) != 2 {
-		core.Warnf("Request URL is invalid: %v", reqPath)
+		core.Warnf("[DREAMEMO] Request URL is Invalid: %v", reqPath)
 		return nil
 	}
 	return segments
