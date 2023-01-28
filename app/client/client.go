@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
-	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"net/http"
 	"net/url"
 	"sync"
+
+	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
+	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
+	"google.golang.org/protobuf/proto"
 )
 
 var _ loadbalance.Instance = (*Client)(nil)

@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"strings"
+
+	"github.com/B1NARY-GR0UP/inquisitor/core"
 )
 
 func CopyBytes(b []byte) []byte {

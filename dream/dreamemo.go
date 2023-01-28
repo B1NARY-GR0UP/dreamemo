@@ -2,13 +2,14 @@ package dream
 
 import (
 	"flag"
+	"net/http"
+	"strings"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app/server"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
 	"github.com/B1NARY-GR0UP/dreamemo/source/redis"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate/lfu"
-	"net/http"
-	"strings"
 )
 
 // Dreamemo Have we ever been sober

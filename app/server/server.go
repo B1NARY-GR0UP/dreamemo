@@ -2,13 +2,14 @@ package server
 
 import (
 	"context"
+	"net/http"
+	"sync"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
-	"net/http"
-	"sync"
 )
 
 var _ loadbalance.LoadBalancer = (*Engine)(nil)

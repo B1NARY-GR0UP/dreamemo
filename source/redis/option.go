@@ -3,9 +3,10 @@ package redis
 import (
 	"context"
 	"crypto/tls"
-	"github.com/redis/go-redis/v9"
 	"net"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type Option func(opts *redis.Options)

@@ -2,8 +2,9 @@ package consistenthash
 
 import (
 	"fmt"
-	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"sort"
+
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 )
 
 var _ distributed.Instance = (*Hash)(nil)
