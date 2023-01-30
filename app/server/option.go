@@ -13,7 +13,7 @@ type Options struct {
 	Addr     string
 }
 
-func NewOptions(opts ...Option) *Options {
+func newOptions(opts ...Option) *Options {
 	options := &Options{
 		BasePath: defaultBasePath,
 		Addr:     defaultHostAddr,

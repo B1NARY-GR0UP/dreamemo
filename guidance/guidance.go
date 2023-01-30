@@ -16,9 +16,9 @@ import (
 )
 
 type Group struct {
+	memo   *memo.Memo
 	name   string
 	getter source.Getter
-	memo   *memo.Memo
 	lbr    loadbalance.LoadBalancer
 	sf     singleflight.SingleFlight
 }
@@ -32,20 +32,18 @@ var syncGroups = struct {
 
 // NewGroup
 // TODO: add cacheBytes; related to lazy init todo
-func NewGroup(memo *memo.Memo, name string, getter source.Getter) *Group {
-	if getter == nil {
-		panic("Getter must not be nil")
-	}
+func NewGroup(memo *memo.Memo, opts ...Option) *Group {
 	syncGroups.Lock()
 	defer syncGroups.Unlock()
+	options := newOptions(opts...)
 	g := &Group{
-		name:   name,
-		getter: getter,
 		memo:   memo,
+		name:   options.Name,
+		getter: options.Getter,
 		sf:     &singleflight.Group{},
 		// TODO: initLoadBalancer according to user's options
 	}
-	syncGroups.groups[name] = g
+	syncGroups.groups[options.Name] = g
 	return g
 }
 

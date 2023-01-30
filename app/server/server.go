@@ -31,11 +31,15 @@ type Engine struct {
 }
 
 func NewEngine(group *guidance.Group, opts ...Option) *Engine {
-	options := NewOptions(opts...)
+	options := newOptions(opts...)
 	e := &Engine{
 		options: options,
 	}
 	return e
+}
+
+func (e *Engine) Run() {
+	_ = http.ListenAndServe(e.options.Addr, e)
 }
 
 // Set instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248

@@ -17,11 +17,12 @@ type Core struct {
 
 // NewLRUCore will new a strategy object based on LRU algorithm
 // TODO: use functional option pattern?
-func NewLRUCore(maxSize int, onEvicted eliminate.EvictFunc) *Core {
+func NewLRUCore(opts ...Option) *Core {
+	options := newOptions(opts...)
 	return &Core{
 		Core: eliminate.Core{
-			MaxSize:   maxSize,
-			OnEvicted: onEvicted,
+			MaxSize:   options.MaxSize,
+			OnEvicted: options.OnEvicted,
 		},
 		store: make(map[eliminate.Key]*list.Element),
 		list:  list.New(),

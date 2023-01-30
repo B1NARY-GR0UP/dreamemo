@@ -24,11 +24,12 @@ type (
 
 // NewLFUCore will new a strategy object based on LFU algorithm
 // TODO: use functional option pattern?
-func NewLFUCore(maxSize int, onEvicted eliminate.EvictFunc) *Core {
+func NewLFUCore(opts ...Option) *Core {
+	options := newOptions(opts...)
 	return &Core{
 		Core: eliminate.Core{
-			MaxSize:   maxSize,
-			OnEvicted: onEvicted,
+			MaxSize:   options.MaxSize,
+			OnEvicted: options.OnEvicted,
 		},
 		store:    make(map[eliminate.Key]Entity),
 		entities: make(Entities, 0),

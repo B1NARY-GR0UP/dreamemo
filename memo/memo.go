@@ -14,9 +14,11 @@ type Memo struct {
 	memo eliminate.ICore
 }
 
-// NewMemo TODO:
+// NewMemo return a new memo base on eliminate layer
 func NewMemo(core eliminate.ICore) *Memo {
-	return nil
+	return &Memo{
+		memo: core,
+	}
 }
 
 // Add to strategy.ICore
