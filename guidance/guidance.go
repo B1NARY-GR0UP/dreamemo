@@ -15,6 +15,14 @@ import (
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 )
 
+// guidance is a runtime object that maintain by dreamemo
+var guidance = struct {
+	sync.RWMutex
+	groups map[string]*Group
+}{
+	groups: make(map[string]*Group),
+}
+
 type Group struct {
 	memo   *memo.Memo
 	name   string
@@ -23,18 +31,11 @@ type Group struct {
 	sf     singleflight.SingleFlight
 }
 
-var syncGroups = struct {
-	sync.RWMutex
-	groups map[string]*Group
-}{
-	groups: make(map[string]*Group),
-}
-
 // NewGroup
 // TODO: add cacheBytes; related to lazy init todo
-func NewGroup(memo *memo.Memo, opts ...Option) *Group {
-	syncGroups.Lock()
-	defer syncGroups.Unlock()
+func NewGroup(memo *memo.Memo, opts ...Option) {
+	guidance.Lock()
+	defer guidance.Unlock()
 	options := newOptions(opts...)
 	g := &Group{
 		memo:   memo,
@@ -43,15 +44,14 @@ func NewGroup(memo *memo.Memo, opts ...Option) *Group {
 		sf:     &singleflight.Group{},
 		// TODO: initLoadBalancer according to user's options
 	}
-	syncGroups.groups[options.Name] = g
-	return g
+	guidance.groups[options.Name] = g
 }
 
 // GetGroup return correspond group related to the name
 func GetGroup(name string) *Group {
-	syncGroups.RLock()
-	defer syncGroups.RUnlock()
-	return syncGroups.groups[name]
+	guidance.RLock()
+	defer guidance.RUnlock()
+	return guidance.groups[name]
 }
 
 func (g *Group) Name() string {

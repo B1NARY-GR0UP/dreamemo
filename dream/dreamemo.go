@@ -48,8 +48,8 @@ func Default(opts ...Option) {
 	// memo layer
 	m := memo.NewMemo(l)
 	// guidance layer
-	g := guidance.NewGroup(m)
-	// e layer
-	e := server.NewEngine(g)
+	guidance.NewGroup(m)
+	// engine layer
+	e := server.NewEngine()
 	e.Run()
 }

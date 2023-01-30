@@ -30,7 +30,7 @@ type Engine struct {
 	Transport func(context.Context) http.RoundTripper
 }
 
-func NewEngine(group *guidance.Group, opts ...Option) *Engine {
+func NewEngine(opts ...Option) *Engine {
 	options := newOptions(opts...)
 	e := &Engine{
 		options: options,

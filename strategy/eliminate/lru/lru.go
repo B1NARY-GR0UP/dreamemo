@@ -16,7 +16,6 @@ type Core struct {
 }
 
 // NewLRUCore will new a strategy object based on LRU algorithm
-// TODO: use functional option pattern?
 func NewLRUCore(opts ...Option) *Core {
 	options := newOptions(opts...)
 	return &Core{

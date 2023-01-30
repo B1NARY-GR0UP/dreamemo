@@ -25,7 +25,6 @@ func NewMemo(core eliminate.ICore) *Memo {
 func (m *Memo) Add(key eliminate.Key, value ByteView) {
 	m.Lock()
 	defer m.Unlock()
-	// TODO: 这里需要做类型判断（使用 Option 或者其他形式来获取使用的 CoreMemo 类型）
 	// TODO: 实现懒加载
 	m.memo.Add(key, value)
 }
