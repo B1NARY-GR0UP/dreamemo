@@ -11,9 +11,7 @@ type ICore interface {
 
 type (
 	Core struct {
-		// MaxSize is the max numbers of entries the strategy can take
-		// Zero means no limit
-		MaxSize   int
+		MaxSize   int // 0 => no limit
 		UsedSize  int
 		OnEvicted EvictFunc
 	}

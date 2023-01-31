@@ -23,7 +23,6 @@ type (
 )
 
 // NewLFUCore will new a strategy object based on LFU algorithm
-// TODO: use functional option pattern?
 func NewLFUCore(opts ...Option) *Core {
 	options := newOptions(opts...)
 	return &Core{

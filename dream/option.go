@@ -1,10 +1,5 @@
 package dream
 
-const (
-	defaultGroupName = "binary"
-	defaultHostAddr  = ":7246"
-)
-
 type Option func(o *Options)
 
 type Options struct {
