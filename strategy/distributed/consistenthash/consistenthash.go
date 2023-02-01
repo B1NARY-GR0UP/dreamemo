@@ -43,6 +43,7 @@ func (h *Hash) Get(key string) string {
 	if len(h.nodes) == 0 {
 		return ""
 	}
+	// same key will get same hash so this ensures that a picked instance won't pick another instance
 	hash := h.options.HashFunc([]byte(key))
 	idx := sort.Search(len(h.ring), func(i int) bool {
 		return h.ring[i] >= hash

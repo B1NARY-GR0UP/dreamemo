@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 
 	"github.com/B1NARY-GR0UP/dreamemo/common/singleflight"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
@@ -31,7 +32,7 @@ type Group struct {
 	sf     singleflight.SingleFlight
 }
 
-// NewGroup
+// NewGroup will not return a group pointer, use GetGroup function directly
 // TODO: add cacheBytes; related to lazy init todo
 func NewGroup(memo *memo.Memo, opts ...Option) {
 	guidance.Lock()
@@ -105,6 +106,10 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 
 func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instance, key string) (memo.ByteView, error) {
 	// TODO: support thrift
+	flagChanged := atomic.CompareAndSwapInt64(&util.RespFlag, 0, 1)
+	if !flagChanged {
+		panic("Flag must be changed")
+	}
 	req := &protobuf.GetRequest{
 		Group: g.name,
 		Key:   key,
@@ -116,7 +121,7 @@ func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instan
 	}
 	return memo.ByteView{
 		B: resp.Value,
-	}, err
+	}, nil
 }
 
 func (g *Group) populateMemo(key string, value memo.ByteView) {

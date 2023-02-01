@@ -6,6 +6,11 @@ import (
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 )
 
+// RespFlag is used to judge response type
+// default value is 0, means response in thrift or protobuf
+// if change it to 1, means response in text, JSON or other optional type
+var RespFlag int64 = 0
+
 func CopyBytes(b []byte) []byte {
 	c := make([]byte, len(b))
 	copy(c, b)

@@ -56,6 +56,8 @@ func (c *Client) Get(ctx context.Context, in *protobuf.GetRequest, out *protobuf
 		return fmt.Errorf("error reading response body: %v", err)
 	}
 	// TODO: support thrift
+	// TODO: use fastpb for protobuf refer to https://github.com/cloudwego/fastpb
+	// TODO: use frugal for thrift refer to https://github.com/cloudwego/frugal
 	err = proto.Unmarshal(b.Bytes(), out)
 	if err != nil {
 		return fmt.Errorf("error decoding response body: %v", err)

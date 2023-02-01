@@ -2,6 +2,7 @@ package dream
 
 import (
 	"flag"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app/server"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
@@ -52,4 +53,5 @@ func Default(opts ...Option) {
 	// engine layer
 	e := server.NewEngine()
 	e.Run()
+	// TODO: 是否需要一个前置的 api server，如果不需要那么获取的值是 protobuf 或者 thrift 形式的未解码数据，但是可以通过设置 flag 解决
 }
