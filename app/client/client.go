@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/B1NARY-GR0UP/dreamemo/protocol"
+	pthrift "github.com/B1NARY-GR0UP/dreamemo/protocol/thrift"
+	"github.com/apache/thrift/lib/go/thrift"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,7 +19,7 @@ import (
 
 var _ loadbalance.Instance = (*Client)(nil)
 
-const HTTPRequestMethod = "GET"
+const HTTPRequestMethod = http.MethodGet
 
 type Client struct {
 	BasePath  string
@@ -29,7 +32,7 @@ var defaultBufferPool = sync.Pool{
 	},
 }
 
-func (c *Client) Get(ctx context.Context, in *protobuf.GetRequest, out *protobuf.GetResponse) error {
+func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.GetResponse) error {
 	requestURL := fmt.Sprintf("%v%v/%v", c.BasePath, url.QueryEscape(in.GetGroup()), url.QueryEscape(in.GetKey()))
 	req, err := http.NewRequest(HTTPRequestMethod, requestURL, nil)
 	if err != nil {
@@ -55,12 +58,19 @@ func (c *Client) Get(ctx context.Context, in *protobuf.GetRequest, out *protobuf
 	if err != nil {
 		return fmt.Errorf("error reading response body: %v", err)
 	}
-	// TODO: support thrift
-	// TODO: use fastpb for protobuf refer to https://github.com/cloudwego/fastpb
-	// TODO: use frugal for thrift refer to https://github.com/cloudwego/frugal
-	err = proto.Unmarshal(b.Bytes(), out)
-	if err != nil {
-		return fmt.Errorf("error decoding response body: %v", err)
+	// TODO: judge to use thrift or protobuf
+	if _, ok := in.(*protobuf.GetRequest); ok {
+		err = proto.Unmarshal(b.Bytes(), out.(*protobuf.GetResponse))
+		if err != nil {
+			return fmt.Errorf("error decoding protobuf response body: %v", err)
+		}
+	}
+	if _, ok := in.(*pthrift.GetRequest); ok {
+		deserializer := thrift.NewTDeserializer()
+		err = deserializer.Read(ctx, out.(*pthrift.GetResponse), b.Bytes())
+		if err != nil {
+			return fmt.Errorf("err decoding thrift response body: %v", err)
+		}
 	}
 	return nil
 }

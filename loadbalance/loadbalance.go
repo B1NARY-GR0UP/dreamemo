@@ -2,8 +2,7 @@ package loadbalance
 
 import (
 	"context"
-
-	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
+	"github.com/B1NARY-GR0UP/dreamemo/protocol"
 )
 
 type LoadBalancer interface {
@@ -11,5 +10,5 @@ type LoadBalancer interface {
 }
 
 type Instance interface {
-	Get(ctx context.Context, in *protobuf.GetRequest, out *protobuf.GetResponse) error
+	Get(ctx context.Context, in protocol.GetRequest, out protocol.GetResponse) error
 }
