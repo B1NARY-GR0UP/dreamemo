@@ -2,9 +2,7 @@ package consistenthash
 
 import "hash/crc32"
 
-type Option struct {
-	F func(o *Options)
-}
+type Option func(o *Options)
 
 // Options TODO: options should be allowed to edit to user
 type Options struct {
@@ -12,10 +10,15 @@ type Options struct {
 	ReplicationFactor int
 }
 
+var defaultOptions = Options{
+	HashFunc:          crc32.ChecksumIEEE,
+	ReplicationFactor: 10,
+}
+
 func newOptions(opts ...Option) *Options {
 	options := &Options{
-		HashFunc:          crc32.ChecksumIEEE,
-		ReplicationFactor: 10,
+		HashFunc:          defaultOptions.HashFunc,
+		ReplicationFactor: defaultOptions.ReplicationFactor,
 	}
 	options.apply(opts...)
 	return options
@@ -23,18 +26,18 @@ func newOptions(opts ...Option) *Options {
 
 func (o *Options) apply(opts ...Option) {
 	for _, opt := range opts {
-		opt.F(o)
+		opt(o)
 	}
 }
 
 func WithHashFunc(hashFunc HashFunc) Option {
-	return Option{F: func(o *Options) {
+	return func(o *Options) {
 		o.HashFunc = hashFunc
-	}}
+	}
 }
 
-func WithReplicationFactor(num int) Option {
-	return Option{F: func(o *Options) {
-		o.ReplicationFactor = num
-	}}
+func WithReplicationFactor(factor int) Option {
+	return func(o *Options) {
+		o.ReplicationFactor = factor
+	}
 }

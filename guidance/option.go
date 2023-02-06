@@ -14,10 +14,15 @@ type Options struct {
 	Getter source.Getter
 }
 
+var defaultOptions = Options{
+	Name:   defaultGroupName,
+	Getter: redis.NewSource(),
+}
+
 func newOptions(opts ...Option) *Options {
 	options := &Options{
-		Name:   defaultGroupName,
-		Getter: redis.NewSource(),
+		Name:   defaultOptions.Name,
+		Getter: defaultOptions.Getter,
 	}
 	options.apply(opts...)
 	return options

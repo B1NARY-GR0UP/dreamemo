@@ -9,10 +9,15 @@ type Options struct {
 	OnEvicted eliminate.EvictFunc
 }
 
+var defaultOptions = Options{
+	MaxSize:   0,
+	OnEvicted: nil,
+}
+
 func newOptions(opts ...Option) *Options {
 	options := &Options{
-		MaxSize:   0,
-		OnEvicted: nil,
+		MaxSize:   defaultOptions.MaxSize,
+		OnEvicted: defaultOptions.OnEvicted,
 	}
 	options.apply(opts...)
 	return options
