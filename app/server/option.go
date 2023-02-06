@@ -1,4 +1,4 @@
-package guidance
+package server
 
 import (
 	"github.com/B1NARY-GR0UP/dreamemo/source"

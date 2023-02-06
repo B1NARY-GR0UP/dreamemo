@@ -1,4 +1,4 @@
-package guidance
+package server
 
 import (
 	"context"
@@ -32,7 +32,7 @@ type Group struct {
 
 // NewGroup will not return a group pointer, use GetGroup function directly
 // TODO: add cacheBytes; related to lazy init todo
-func NewGroup(memo *memo.Memo, opts ...Option) {
+func NewGroup(memo *memo.Memo, lbr loadbalance.LoadBalancer, opts ...Option) {
 	guidance.Lock()
 	defer guidance.Unlock()
 	options := newOptions(opts...)
@@ -40,8 +40,8 @@ func NewGroup(memo *memo.Memo, opts ...Option) {
 		memo:   memo,
 		name:   options.Name,
 		getter: options.Getter,
+		lbr:    lbr,
 		sf:     &singleflight.Group{},
-		// TODO: initLoadBalancer according to user's options
 	}
 	guidance.groups[options.Name] = g
 }
