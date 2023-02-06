@@ -2,19 +2,20 @@ package server
 
 import (
 	"context"
+	"github.com/B1NARY-GR0UP/dreamemo/app"
+	"github.com/B1NARY-GR0UP/dreamemo/app/client"
+	"github.com/B1NARY-GR0UP/dreamemo/common/util"
+	"github.com/B1NARY-GR0UP/dreamemo/guidance"
+	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
 	pthrift "github.com/B1NARY-GR0UP/dreamemo/protocol/thrift"
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
+	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"github.com/apache/thrift/lib/go/thrift"
 	"google.golang.org/protobuf/proto"
 	"net/http"
 	"sync"
 	"sync/atomic"
-
-	"github.com/B1NARY-GR0UP/dreamemo/app/client"
-	"github.com/B1NARY-GR0UP/dreamemo/common/util"
-	"github.com/B1NARY-GR0UP/dreamemo/guidance"
-	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
-	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 )
 
 var _ loadbalance.LoadBalancer = (*Engine)(nil)
@@ -23,22 +24,23 @@ var _ loadbalance.LoadBalancer = (*Engine)(nil)
 type Engine struct {
 	// TODO: choose lb method according to users option
 	sync.Mutex
+	options *app.Options
 	// addr of local instance
-	// TODO: 需要在实例化时赋值？？
-	self    string
-	options *Options
+	self string
 	// an instance only holds its addr
-	// TODO: support more field to an instance e.g. tags
 	instances distributed.Instance
 	clients   map[string]*client.Client
-	// TODO: how to use
+	// TODO: (check needed)
 	Transport func(context.Context) http.RoundTripper
 }
 
-func NewEngine(opts ...Option) *Engine {
-	options := newOptions(opts...)
+func NewEngine(opts ...app.Option) *Engine {
+	options := app.NewOptions(opts...)
 	e := &Engine{
-		options: options,
+		// TODO: may cause bug, need secondly check
+		options:   options,
+		self:      options.Addr, // e.g. 127.0.0.1:7246
+		instances: options.Strategy,
 	}
 	return e
 }
@@ -48,14 +50,14 @@ func (e *Engine) Run() {
 }
 
 // Set instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
-func (e *Engine) Set(instances ...string) {
+func (e *Engine) Set(insts ...string) {
 	e.Lock()
 	defer e.Unlock()
-	// TODO: decide to use which kind of distributed strategy according to the option
-	e.instances.Add(instances...)
-	e.clients = make(map[string]*client.Client, len(instances))
-	for _, instance := range instances {
+	e.instances.Add(insts...)
+	e.clients = make(map[string]*client.Client, len(insts))
+	for _, instance := range insts {
 		e.clients[instance] = &client.Client{
+			Options:   e.options,
 			BasePath:  instance + e.options.BasePath,
 			Transport: e.Transport,
 		}
@@ -66,7 +68,6 @@ func (e *Engine) Set(instances ...string) {
 func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
 	e.Lock()
 	defer e.Unlock()
-	// TODO: 需要实例化 instance，默认使用 consistent hash
 	ins := e.instances.Get(key)
 	if ins == "" {
 		return nil, false
@@ -98,22 +99,26 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if util.RespFlag == 1 {
-		// TODO: 调用 write 后需将 flag 重新设置为默认值 0
 		atomic.CompareAndSwapInt64(&util.RespFlag, 1, 0)
 		w.Header().Set("Content-Type", "application/octet-stream")
 		// TODO: return in JSON (will be supported)
 		_, _ = w.Write(byteView.ByteSlice())
 	} else {
-		// TODO: protobuf and thrift marshal!!!
-		// TODO: 如果调用了 getFromInstance 则更改 flag 为 1，判断为 1 后返回 JSON 或者其他格式，否则返回 thrift 或 protobuf 形式
-		// thrift
-		serializer := thrift.NewTSerializer()
-		body, _ := serializer.Write(context.Background(), &pthrift.GetResponse{Value: byteView.ByteSlice()})
-		w.Header().Set("Content-Type", "application/octet-stream")
-		_, _ = w.Write(body)
-		// protobuf
-		body, _ = proto.Marshal(&protobuf.GetResponse{Value: byteView.ByteSlice()})
-		w.Header().Set("Content-Type", "application/octet-stream")
-		_, _ = w.Write(body)
+		if e.options.Thrift {
+			serializer := thrift.NewTSerializer()
+			body, err := serializer.Write(context.Background(), &pthrift.GetResponse{Value: byteView.ByteSlice()})
+			if err != nil {
+				core.Warnf("thrift serialize err: %v", err)
+			}
+			w.Header().Set("Content-Type", "application/octet-stream")
+			_, _ = w.Write(body)
+		} else {
+			body, err := proto.Marshal(&protobuf.GetResponse{Value: byteView.ByteSlice()})
+			if err != nil {
+				core.Warnf("protobuf marshal err: %v", err)
+			}
+			w.Header().Set("Content-Type", "application/octet-stream")
+			_, _ = w.Write(body)
+		}
 	}
 }

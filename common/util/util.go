@@ -1,9 +1,8 @@
 package util
 
 import (
-	"strings"
-
 	"github.com/B1NARY-GR0UP/inquisitor/core"
+	"strings"
 )
 
 // RespFlag is used to judge response type

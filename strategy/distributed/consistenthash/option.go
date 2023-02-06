@@ -6,6 +6,7 @@ type Option struct {
 	F func(o *Options)
 }
 
+// Options TODO: options should be allowed to edit to user
 type Options struct {
 	HashFunc          HashFunc
 	ReplicationFactor int

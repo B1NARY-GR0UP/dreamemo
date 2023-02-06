@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/B1NARY-GR0UP/dreamemo/app"
+	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/protocol"
+	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
 	pthrift "github.com/B1NARY-GR0UP/dreamemo/protocol/thrift"
 	"github.com/apache/thrift/lib/go/thrift"
+	"google.golang.org/protobuf/proto"
 	"io"
 	"net/http"
 	"net/url"
 	"sync"
-
-	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
-	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
-	"google.golang.org/protobuf/proto"
 )
 
 var _ loadbalance.Instance = (*Client)(nil)
@@ -22,12 +22,13 @@ var _ loadbalance.Instance = (*Client)(nil)
 const HTTPRequestMethod = http.MethodGet
 
 type Client struct {
+	Options   *app.Options
 	BasePath  string
 	Transport func(context.Context) http.RoundTripper
 }
 
 var defaultBufferPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return new(bytes.Buffer)
 	},
 }
@@ -58,18 +59,20 @@ func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.G
 	if err != nil {
 		return fmt.Errorf("error reading response body: %v", err)
 	}
-	// TODO: judge to use thrift or protobuf
-	if _, ok := in.(*protobuf.GetRequest); ok {
-		err = proto.Unmarshal(b.Bytes(), out.(*protobuf.GetResponse))
-		if err != nil {
-			return fmt.Errorf("error decoding protobuf response body: %v", err)
+	if c.Options.Thrift {
+		if _, ok := in.(*pthrift.GetRequest); ok {
+			deserializer := thrift.NewTDeserializer()
+			err = deserializer.Read(ctx, out.(*pthrift.GetResponse), b.Bytes())
+			if err != nil {
+				return fmt.Errorf("err decoding thrift response body: %v", err)
+			}
 		}
-	}
-	if _, ok := in.(*pthrift.GetRequest); ok {
-		deserializer := thrift.NewTDeserializer()
-		err = deserializer.Read(ctx, out.(*pthrift.GetResponse), b.Bytes())
-		if err != nil {
-			return fmt.Errorf("err decoding thrift response body: %v", err)
+	} else {
+		if _, ok := in.(*protobuf.GetRequest); ok {
+			err = proto.Unmarshal(b.Bytes(), out.(*protobuf.GetResponse))
+			if err != nil {
+				return fmt.Errorf("error decoding protobuf response body: %v", err)
+			}
 		}
 	}
 	return nil

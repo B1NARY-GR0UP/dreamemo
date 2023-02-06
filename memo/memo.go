@@ -1,10 +1,9 @@
 package memo
 
 import (
-	"sync"
-
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
+	"sync"
 )
 
 // Memo ensures that all accesses to the guidance are concurrency safe

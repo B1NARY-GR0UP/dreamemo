@@ -2,7 +2,6 @@ package lru
 
 import (
 	"container/list"
-
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 )
 

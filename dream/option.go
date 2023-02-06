@@ -3,6 +3,7 @@ package dream
 type Option func(o *Options)
 
 type Options struct {
+	temp string
 }
 
 func newOptions(opts ...Option) *Options {

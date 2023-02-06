@@ -3,9 +3,6 @@ package guidance
 import (
 	"context"
 	"fmt"
-	"sync"
-	"sync/atomic"
-
 	"github.com/B1NARY-GR0UP/dreamemo/common/singleflight"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
@@ -14,6 +11,8 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/source"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
+	"sync"
+	"sync/atomic"
 )
 
 // guidance is a runtime object that maintain by dreamemo
@@ -105,11 +104,11 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 }
 
 func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instance, key string) (memo.ByteView, error) {
-	// TODO: support thrift
 	flagChanged := atomic.CompareAndSwapInt64(&util.RespFlag, 0, 1)
 	if !flagChanged {
 		panic("Flag must be changed")
 	}
+	// TODO: use apex GetRequest
 	req := &protobuf.GetRequest{
 		Group: g.name,
 		Key:   key,
