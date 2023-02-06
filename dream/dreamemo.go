@@ -3,6 +3,7 @@ package dream
 import (
 	"flag"
 	"github.com/B1NARY-GR0UP/dreamemo/app/server"
+	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate/lru"
 )
@@ -39,7 +40,7 @@ func initFlag() {
 // eliminate strategy   => lru
 // distributed strategy => consistent hash
 // source               => redis
-func Default(opts ...Option) *server.Group {
+func Default(opts ...Option) *guidance.Group {
 	// TODO: 虽然是默认配置，但是每层的小配置是需要允许用户修改的
 	// eliminate layer
 	l := lru.NewLRUCore()
@@ -48,7 +49,7 @@ func Default(opts ...Option) *server.Group {
 	// engine layer
 	e := server.NewEngine()
 	// guidance layer
-	server.NewGroup(m, e)
+	guidance.NewGroup(m, e)
 	e.Run()
-	return server.GetGroup("binary")
+	return guidance.GetGroup("binary")
 }

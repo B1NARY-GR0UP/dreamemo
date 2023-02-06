@@ -5,6 +5,7 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/app"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
+	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/protocol/protobuf"
 	pthrift "github.com/B1NARY-GR0UP/dreamemo/protocol/thrift"
@@ -88,7 +89,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	groupName := segments[0]
 	key := segments[1]
-	matchedGroup := GetGroup(groupName)
+	matchedGroup := guidance.GetGroup(groupName)
 	if matchedGroup == nil {
 		http.Error(w, "No Such Group: "+groupName, http.StatusBadRequest)
 		return

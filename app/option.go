@@ -1,13 +1,9 @@
 package app
 
 import (
+	"github.com/B1NARY-GR0UP/dreamemo/common/constant"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed/consistenthash"
-)
-
-const (
-	defaultBasePath = "/_dreamemo/"
-	defaultHostAddr = ":7246"
 )
 
 type Option func(o *Options)
@@ -22,8 +18,8 @@ type Options struct {
 }
 
 var defaultOptions = Options{
-	BasePath: defaultBasePath,
-	Addr:     defaultHostAddr,
+	BasePath: constant.DefaultBasePath,
+	Addr:     constant.DefaultStandAloneAddr,
 	Strategy: consistenthash.New(),
 	Thrift:   false,
 }

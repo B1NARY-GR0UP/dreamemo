@@ -1,4 +1,4 @@
-package server
+package guidance
 
 import (
 	"context"

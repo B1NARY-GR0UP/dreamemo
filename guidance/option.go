@@ -1,11 +1,10 @@
-package server
+package guidance
 
 import (
+	"github.com/B1NARY-GR0UP/dreamemo/common/constant"
 	"github.com/B1NARY-GR0UP/dreamemo/source"
 	"github.com/B1NARY-GR0UP/dreamemo/source/redis"
 )
-
-const defaultGroupName = "binary"
 
 type Option func(o *Options)
 
@@ -15,7 +14,7 @@ type Options struct {
 }
 
 var defaultOptions = Options{
-	Name:   defaultGroupName,
+	Name:   constant.DefaultGroupName,
 	Getter: redis.NewSource(),
 }
 
