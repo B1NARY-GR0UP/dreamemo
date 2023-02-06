@@ -42,7 +42,6 @@ func initFlag() {
 // source               => redis
 func Default(opts ...Option) {
 	// TODO: 虽然是默认配置，但是每层的小配置是需要允许用户修改的
-	// TODO: group should be a field of engine to init
 	// eliminate layer
 	l := lru.NewLRUCore()
 	// memo layer
@@ -52,5 +51,4 @@ func Default(opts ...Option) {
 	// engine layer
 	e := server.NewEngine()
 	e.Run()
-	// TODO: 是否需要一个前置的 api server，如果不需要那么获取的值是 protobuf 或者 thrift 形式的未解码数据，但是可以通过设置 flag 解决
 }

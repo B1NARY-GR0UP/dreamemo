@@ -12,7 +12,6 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"sync"
-	"sync/atomic"
 )
 
 // guidance is a runtime object that maintain by dreamemo
@@ -85,9 +84,9 @@ func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 		return g.getLocally(ctx, key)
 	})
 	if err != nil {
-		return bv.(memo.ByteView), nil
+		return memo.ByteView{}, err
 	}
-	return memo.ByteView{}, err
+	return bv.(memo.ByteView), nil
 }
 
 func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, error) {
@@ -104,10 +103,6 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 }
 
 func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instance, key string) (memo.ByteView, error) {
-	flagChanged := atomic.CompareAndSwapInt64(&util.RespFlag, 0, 1)
-	if !flagChanged {
-		panic("Flag must be changed")
-	}
 	// TODO: use apex GetRequest
 	req := &protobuf.GetRequest{
 		Group: g.name,

@@ -15,14 +15,12 @@ import (
 	"google.golang.org/protobuf/proto"
 	"net/http"
 	"sync"
-	"sync/atomic"
 )
 
 var _ loadbalance.LoadBalancer = (*Engine)(nil)
 
 // Engine server engine of each instance
 type Engine struct {
-	// TODO: choose lb method according to users option
 	sync.Mutex
 	options *app.Options
 	// addr of local instance
@@ -46,11 +44,15 @@ func NewEngine(opts ...app.Option) *Engine {
 }
 
 func (e *Engine) Run() {
-	_ = http.ListenAndServe(e.options.Addr, e)
+	core.Infof("[DREAMEMO] Server is listening on %v", e.options.Addr)
+	err := http.ListenAndServe(e.options.Addr, e)
+	if err != nil {
+		core.Errorf("[DREAMEMO] Server started failed: %v", err)
+	}
 }
 
-// Set instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
-func (e *Engine) Set(insts ...string) {
+// Register instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
+func (e *Engine) Register(insts ...string) {
 	e.Lock()
 	defer e.Unlock()
 	e.instances.Add(insts...)
@@ -98,27 +100,20 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if util.RespFlag == 1 {
-		atomic.CompareAndSwapInt64(&util.RespFlag, 1, 0)
-		w.Header().Set("Content-Type", "application/octet-stream")
-		// TODO: return in JSON (will be supported)
-		_, _ = w.Write(byteView.ByteSlice())
-	} else {
-		if e.options.Thrift {
-			serializer := thrift.NewTSerializer()
-			body, err := serializer.Write(context.Background(), &pthrift.GetResponse{Value: byteView.ByteSlice()})
-			if err != nil {
-				core.Warnf("thrift serialize err: %v", err)
-			}
-			w.Header().Set("Content-Type", "application/octet-stream")
-			_, _ = w.Write(body)
-		} else {
-			body, err := proto.Marshal(&protobuf.GetResponse{Value: byteView.ByteSlice()})
-			if err != nil {
-				core.Warnf("protobuf marshal err: %v", err)
-			}
-			w.Header().Set("Content-Type", "application/octet-stream")
-			_, _ = w.Write(body)
+	if e.options.Thrift {
+		serializer := thrift.NewTSerializer()
+		body, err := serializer.Write(context.Background(), &pthrift.GetResponse{Value: byteView.ByteSlice()})
+		if err != nil {
+			core.Warnf("[DREAMEMO] Thrift serialize err: %v", err)
 		}
+		w.Header().Set("Content-Type", "application/octet-stream")
+		_, _ = w.Write(body)
+	} else {
+		body, err := proto.Marshal(&protobuf.GetResponse{Value: byteView.ByteSlice()})
+		if err != nil {
+			core.Warnf("[DREAMEMO] Protobuf marshal err: %v", err)
+		}
+		w.Header().Set("Content-Type", "application/octet-stream")
+		_, _ = w.Write(body)
 	}
 }
