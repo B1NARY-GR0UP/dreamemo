@@ -3,20 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app"
 	"github.com/B1NARY-GR0UP/dreamemo/app/server"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
 	"github.com/B1NARY-GR0UP/dreamemo/source"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate/lfu"
-	"log"
-	"net/http"
 )
 
 var db = map[string]string{
-	"red":   "#FF0000",
-	"green": "#00FF00",
-	"blue":  "#0000FF",
+	"binary": "dreamemo",
+	"hello":  "world",
+	"foo":    "bar",
 }
 
 func main() {

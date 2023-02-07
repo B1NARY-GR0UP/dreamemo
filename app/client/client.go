@@ -4,6 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"sync"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
 	"github.com/B1NARY-GR0UP/dreamemo/protocol"
@@ -11,10 +16,6 @@ import (
 	pthrift "github.com/B1NARY-GR0UP/dreamemo/protocol/thrift"
 	"github.com/apache/thrift/lib/go/thrift"
 	"google.golang.org/protobuf/proto"
-	"io"
-	"net/http"
-	"net/url"
-	"sync"
 )
 
 var _ loadbalance.Instance = (*Client)(nil)
@@ -45,7 +46,7 @@ func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.G
 		tpt = c.Transport(ctx)
 	}
 	resp, err := tpt.RoundTrip(req)
-	//defer resp.Body.Close() // nolint:errcheck
+	// defer resp.Body.Close() // nolint:errcheck
 	if err != nil {
 		return err
 	}

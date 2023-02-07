@@ -1,8 +1,9 @@
 package lfu
 
 import (
-	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"sort"
+
+	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 )
 
 var _ eliminate.ICore = (*Core)(nil)

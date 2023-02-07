@@ -10,9 +10,21 @@ DREAMEMO is a distributed cache with out-of-the-box, high-scalability, modular-d
 
 ![dreamemo-arch](./image/dreamemo-arch.png)
 
+## Install
+
+```shell
+go get github.com/B1NARY-GR0UP/dreamemo
+```
+
 ## Quick Start
 
-[example](./example/helloworld)
+### Hello World
+
+[example](example/hello-world/main.go)
+
+### Custom Assemble
+
+[example](example/custom-assemble/main.go)
 
 ## End
 

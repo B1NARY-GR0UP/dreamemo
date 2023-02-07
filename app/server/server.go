@@ -2,6 +2,10 @@ package server
 
 import (
 	"context"
+	"net/http"
+	"strings"
+	"sync"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
@@ -13,9 +17,6 @@ import (
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 	"github.com/apache/thrift/lib/go/thrift"
 	"google.golang.org/protobuf/proto"
-	"net/http"
-	"strings"
-	"sync"
 )
 
 var _ loadbalance.LoadBalancer = (*Engine)(nil)

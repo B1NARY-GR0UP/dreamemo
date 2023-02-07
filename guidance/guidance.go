@@ -3,6 +3,8 @@ package guidance
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/B1NARY-GR0UP/dreamemo/common/singleflight"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
@@ -11,7 +13,6 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/protocol/thrift"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
 	"github.com/B1NARY-GR0UP/inquisitor/core"
-	"sync"
 )
 
 // guidance is a runtime object that maintain by dreamemo
