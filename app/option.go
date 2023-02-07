@@ -9,12 +9,10 @@ import (
 type Option func(o *Options)
 
 type Options struct {
-	// TODO: add JSON option
 	BasePath string
 	Addr     string
 	Strategy distributed.Instance
-	// used for both server and client
-	Thrift bool
+	Thrift   bool
 }
 
 var defaultOptions = Options{
@@ -54,7 +52,8 @@ func WithHostAddr(addr string) Option {
 	}
 }
 
-func WithThrift() Option {
+// WithThriftI must be consistent will guidance.WithThriftII
+func WithThriftI() Option {
 	return func(o *Options) {
 		o.Thrift = true
 	}

@@ -8,11 +8,6 @@ import (
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate/lru"
 )
 
-// Dreamemo Have we ever been sober
-type Dreamemo struct {
-	options *Options
-}
-
 const (
 	// addrsFlag
 	addrsFlagName         = "addrs"
@@ -35,13 +30,13 @@ func ParseFlag() {
 }
 
 // StandAlone in order to help user quick start
-// StandAlone uses following default options
-// StandAlone is in standalone mode, listen on :7246
+// listen on :7246
+// uses following default options:
 // protocol             => protobuf
 // eliminate strategy   => lru
 // distributed strategy => consistent hash
 // source               => redis
-func StandAlone(opts ...Option) (*server.Engine, *guidance.Group) {
+func StandAlone() *server.Engine {
 	// engine layer
 	e := server.NewEngine()
 	// eliminate layer
@@ -49,6 +44,6 @@ func StandAlone(opts ...Option) (*server.Engine, *guidance.Group) {
 	// memo layer
 	m := memo.NewMemo(l)
 	// guidance layer
-	g := guidance.NewGroup(m, e)
-	return e, g
+	guidance.NewGroup(m, e)
+	return e
 }

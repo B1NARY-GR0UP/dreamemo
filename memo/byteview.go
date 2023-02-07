@@ -7,7 +7,6 @@ import (
 // ByteView data will store in ByteView form
 type ByteView struct {
 	B []byte
-	// TODO: decide Add s string field
 }
 
 // Len returns the length of the data

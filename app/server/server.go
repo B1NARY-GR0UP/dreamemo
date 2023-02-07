@@ -52,8 +52,8 @@ func (e *Engine) Run() {
 	}
 }
 
-// Register instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
-func (e *Engine) Register(insts ...string) {
+// RegisterInstances instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
+func (e *Engine) RegisterInstances(insts ...string) {
 	e.Lock()
 	defer e.Unlock()
 	e.instances.Add(insts...)
@@ -105,7 +105,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		serializer := thrift.NewTSerializer()
 		body, err := serializer.Write(context.Background(), &pthrift.GetResponse{Value: byteView.ByteSlice()})
 		if err != nil {
-			core.Warnf("[DREAMEMO] Thrift serialize err: %v", err)
+			core.Warnf("[DREAMEMO] thrift serialize err: %v", err)
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
 		_, _ = w.Write(body)
