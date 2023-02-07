@@ -33,14 +33,14 @@ func initFlag() {
 	flag.Parse()
 }
 
-// Default in order to help user quick start
-// Default uses following default options
-// Default is in standalone mode, listen on :7246
+// StandAlone in order to help user quick start
+// StandAlone uses following default options
+// StandAlone is in standalone mode, listen on :7246
 // protocol             => protobuf
 // eliminate strategy   => lru
 // distributed strategy => consistent hash
 // source               => redis
-func Default(opts ...Option) *guidance.Group {
+func StandAlone(opts ...Option) *guidance.Group {
 	// TODO: 虽然是默认配置，但是每层的小配置是需要允许用户修改的
 	// eliminate layer
 	l := lru.NewLRUCore()
@@ -49,7 +49,7 @@ func Default(opts ...Option) *guidance.Group {
 	// engine layer
 	e := server.NewEngine()
 	// guidance layer
-	guidance.NewGroup(m, e)
+	guidance.NewGroup(m)
 	e.Run()
 	return guidance.GetGroup("binary")
 }

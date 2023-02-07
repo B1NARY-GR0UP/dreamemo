@@ -26,13 +26,13 @@ type Group struct {
 	memo   *memo.Memo
 	name   string
 	getter source.Getter
-	lbr    loadbalance.LoadBalancer
+	engine loadbalance.LoadBalancer
 	sf     singleflight.SingleFlight
 }
 
 // NewGroup will not return a group pointer, use GetGroup function directly
 // TODO: add cacheBytes; related to lazy init todo
-func NewGroup(memo *memo.Memo, lbr loadbalance.LoadBalancer, opts ...Option) {
+func NewGroup(memo *memo.Memo, opts ...Option) {
 	guidance.Lock()
 	defer guidance.Unlock()
 	options := newOptions(opts...)
@@ -40,7 +40,6 @@ func NewGroup(memo *memo.Memo, lbr loadbalance.LoadBalancer, opts ...Option) {
 		memo:   memo,
 		name:   options.Name,
 		getter: options.Getter,
-		lbr:    lbr,
 		sf:     &singleflight.Group{},
 	}
 	guidance.groups[options.Name] = g
@@ -51,6 +50,13 @@ func GetGroup(name string) *Group {
 	guidance.RLock()
 	defer guidance.RUnlock()
 	return guidance.groups[name]
+}
+
+func (g *Group) RegisterEngine(engine loadbalance.LoadBalancer) {
+	if g.engine != nil {
+		panic("Engine can only register once")
+	}
+	g.engine = engine
 }
 
 func (g *Group) Name() string {
@@ -73,8 +79,8 @@ func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 	// TODO: review guidance
 	bv, err := g.sf.Do(key, func() (any, error) {
-		if g.lbr != nil {
-			if ins, ok := g.lbr.Pick(key); ok {
+		if g.engine != nil {
+			if ins, ok := g.engine.Pick(key); ok {
 				if value, err := g.getFromInstance(ctx, ins, key); err != nil {
 					return value, nil
 				}
