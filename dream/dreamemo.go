@@ -23,12 +23,13 @@ const (
 
 var addrsFlag string
 
-// quick start
+// ParseFlag quick start
 // -addrs=:7246,:7247,:7248
 // -addrs=:7247,:7246,:7248
 // -addrs=:7248,:7246,:7247
 // hint: first element is local instance
-func initFlag() {
+// TODO: 提供一个解析 flag 的函数，返回数组，包含地址配置
+func ParseFlag() {
 	flag.StringVar(&addrsFlag, addrsFlagName, addrsFlagDefaultValue, addrsFlagHint)
 	flag.Parse()
 }
@@ -40,16 +41,14 @@ func initFlag() {
 // eliminate strategy   => lru
 // distributed strategy => consistent hash
 // source               => redis
-func StandAlone(opts ...Option) *guidance.Group {
-	// TODO: 虽然是默认配置，但是每层的小配置是需要允许用户修改的
+func StandAlone(opts ...Option) (*server.Engine, *guidance.Group) {
+	// engine layer
+	e := server.NewEngine()
 	// eliminate layer
 	l := lru.NewLRUCore()
 	// memo layer
 	m := memo.NewMemo(l)
-	// engine layer
-	e := server.NewEngine()
 	// guidance layer
-	guidance.NewGroup(m)
-	e.Run()
-	return guidance.GetGroup("binary")
+	g := guidance.NewGroup(m, e)
+	return e, g
 }

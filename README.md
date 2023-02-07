@@ -2,7 +2,7 @@
 
 > You Can (Not) Escape
 
-![]()
+![dreamemo](./image/dreamemo.png)
 
 DREAMEMO is a distributed cache with out-of-the-box, high-scalability, modular-design features.
 

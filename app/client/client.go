@@ -45,7 +45,7 @@ func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.G
 		tpt = c.Transport(ctx)
 	}
 	resp, err := tpt.RoundTrip(req)
-	defer resp.Body.Close() // nolint:errcheck
+	//defer resp.Body.Close() // nolint:errcheck
 	if err != nil {
 		return err
 	}

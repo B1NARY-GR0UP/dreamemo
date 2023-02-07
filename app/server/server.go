@@ -14,6 +14,7 @@ import (
 	"github.com/apache/thrift/lib/go/thrift"
 	"google.golang.org/protobuf/proto"
 	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -74,7 +75,7 @@ func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
 	if ins == "" {
 		return nil, false
 	}
-	if ins != e.self {
+	if !strings.Contains(ins, e.self) {
 		return e.clients[ins], true
 	}
 	return nil, false
