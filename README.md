@@ -18,13 +18,17 @@ go get github.com/B1NARY-GR0UP/dreamemo
 
 ## Quick Start
 
-### Hello World
+### Standalone
 
-[example](example/hello-world/main.go)
+[example](example/standalone/main.go)
+
+### Cluster
+
+[example](example/cluster/main.go)
 
 ### Custom Assemble
 
-[example](example/custom-assemble/main.go)
+[example](example/assemble/main.go)
 
 ## End
 

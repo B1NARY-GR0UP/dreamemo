@@ -31,6 +31,7 @@ type Engine struct {
 	instances distributed.Instance
 	clients   map[string]*client.Client
 	// TODO: (check needed)
+	// TODO: add to options
 	Transport func(context.Context) http.RoundTripper
 }
 
@@ -45,11 +46,12 @@ func NewEngine(opts ...app.Option) *Engine {
 	return e
 }
 
+// Run is used to start cluster, should not be used in standalone mode
 func (e *Engine) Run() {
-	core.Infof("[DREAMEMO] Server is listening on %v", e.options.Addr)
+	core.Infof("---DREAMEMO--- Server is listening on %v", e.options.Addr)
 	err := http.ListenAndServe(e.options.Addr, e)
 	if err != nil {
-		core.Errorf("[DREAMEMO] Server started failed: %v", err)
+		core.Errorf("---DREAMEMO--- Server started failed: %v", err)
 	}
 }
 
@@ -106,14 +108,14 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		serializer := thrift.NewTSerializer()
 		body, err := serializer.Write(context.Background(), &pthrift.GetResponse{Value: byteView.ByteSlice()})
 		if err != nil {
-			core.Warnf("[DREAMEMO] thrift serialize err: %v", err)
+			core.Warnf("---DREAMEMO--- thrift serialize err: %v", err)
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
 		_, _ = w.Write(body)
 	} else {
 		body, err := proto.Marshal(&protobuf.GetResponse{Value: byteView.ByteSlice()})
 		if err != nil {
-			core.Warnf("[DREAMEMO] Protobuf marshal err: %v", err)
+			core.Warnf("---DREAMEMO--- Protobuf marshal err: %v", err)
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
 		_, _ = w.Write(body)

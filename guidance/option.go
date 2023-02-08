@@ -36,15 +36,15 @@ func (o *Options) apply(opts ...Option) {
 	}
 }
 
-// WithName define name for group
-func WithName(name string) Option {
+// WithGroupName define name for group
+func WithGroupName(name string) Option {
 	return func(o *Options) {
 		o.name = name
 	}
 }
 
-// WithThriftII must be consistent will app.WithThriftI
-func WithThriftII() Option {
+// WithThrift1 must be consistent will app.WithThrift0
+func WithThrift1() Option {
 	return func(o *Options) {
 		o.thrift = true
 	}

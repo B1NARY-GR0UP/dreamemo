@@ -60,7 +60,7 @@ func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 		return memo.ByteView{}, fmt.Errorf("key is null")
 	}
 	if v, ok := g.memo.Get(eliminate.Key(key)); ok {
-		core.Info("[DREAMEMO] Core hit")
+		core.Info("---DREAMEMO--- Core hit")
 		return v, nil
 	}
 	return g.load(ctx, key)
@@ -70,7 +70,7 @@ func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 	bv, err := g.sf.Do(key, func() (any, error) {
 		if g.engine != nil {
 			if ins, ok := g.engine.Pick(key); ok {
-				core.Info("[DREAMEMO] Get from other instance")
+				core.Info("---DREAMEMO--- Get from other instance")
 				value, err := g.getFromInstance(ctx, ins, key)
 				if err != nil {
 					return memo.ByteView{}, err
@@ -79,7 +79,7 @@ func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 				return value, nil
 			}
 		}
-		core.Info("[DREAMEMO] Get locally")
+		core.Info("---DREAMEMO--- Get locally")
 		return g.getLocally(ctx, key)
 	})
 	if err != nil {

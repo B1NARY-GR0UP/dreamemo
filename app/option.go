@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/B1NARY-GR0UP/dreamemo/common/constant"
+	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed/consistenthash"
 )
@@ -47,13 +48,14 @@ func WithBasePath(path string) Option {
 }
 
 func WithHostAddr(addr string) Option {
+	addr = util.StandardizeAddr(addr)
 	return func(o *Options) {
 		o.Addr = addr
 	}
 }
 
-// WithThriftI must be consistent will guidance.WithThriftII
-func WithThriftI() Option {
+// WithThrift0 must be consistent will guidance.WithThriftII
+func WithThrift0() Option {
 	return func(o *Options) {
 		o.Thrift = true
 	}
