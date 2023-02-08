@@ -32,7 +32,7 @@ import (
 var db = map[string]string{
 	"binary": "dreamemo",
 	"hello":  "world",
-	"foo":    "bar",
+	"ping":   "pong",
 }
 
 func getFromDB(_ context.Context, key string) ([]byte, error) {
@@ -44,7 +44,7 @@ func getFromDB(_ context.Context, key string) ([]byte, error) {
 }
 
 // go run .
-// curl localhost:8080/hello?key=binary
+// curl localhost:8080/hello?key=ping
 func main() {
 	dream.StandAlone(source.GetterFunc(getFromDB))
 	p := bin.Default(core.WithHostAddr(":8080"))

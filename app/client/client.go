@@ -38,9 +38,8 @@ var _ loadbalance.Instance = (*Client)(nil)
 const HTTPRequestMethod = http.MethodGet
 
 type Client struct {
-	Options   *app.Options
-	BasePath  string
-	Transport func(context.Context) http.RoundTripper
+	Options  *app.Options
+	BasePath string
 }
 
 var defaultBufferPool = sync.Pool{
@@ -57,8 +56,8 @@ func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.G
 	}
 	req = req.WithContext(ctx)
 	tpt := http.DefaultTransport
-	if c.Transport != nil {
-		tpt = c.Transport(ctx)
+	if c.Options.Transport != nil {
+		tpt = c.Options.Transport(ctx)
 	}
 	resp, err := tpt.RoundTrip(req)
 	// defer resp.Body.Close() // nolint:errcheck

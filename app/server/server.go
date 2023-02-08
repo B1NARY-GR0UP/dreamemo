@@ -45,9 +45,6 @@ type Engine struct {
 	// an instance only holds its addr
 	instances distributed.Instance
 	clients   map[string]*client.Client
-	// TODO: (check needed)
-	// TODO: add to options
-	Transport func(context.Context) http.RoundTripper
 }
 
 func NewEngine(opts ...app.Option) *Engine {
@@ -78,9 +75,8 @@ func (e *Engine) RegisterInstances(insts ...string) {
 	e.clients = make(map[string]*client.Client, len(insts))
 	for _, instance := range insts {
 		e.clients[instance] = &client.Client{
-			Options:   e.options,
-			BasePath:  instance + e.options.BasePath,
-			Transport: e.Transport,
+			Options:  e.options,
+			BasePath: instance + e.options.BasePath,
 		}
 	}
 }

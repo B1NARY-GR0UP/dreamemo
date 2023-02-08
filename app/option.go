@@ -16,6 +16,9 @@
 package app
 
 import (
+	"context"
+	"net/http"
+
 	"github.com/B1NARY-GR0UP/dreamemo/common/constant"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
@@ -25,17 +28,19 @@ import (
 type Option func(o *Options)
 
 type Options struct {
-	BasePath string
-	Addr     string
-	Strategy distributed.Instance
-	Thrift   bool
+	BasePath  string
+	Addr      string
+	Strategy  distributed.Instance
+	Thrift    bool
+	Transport func(context.Context) http.RoundTripper
 }
 
 var defaultOptions = Options{
-	BasePath: constant.DefaultBasePath,
-	Addr:     constant.DefaultStandAloneAddr,
-	Strategy: consistenthash.New(),
-	Thrift:   false,
+	BasePath:  constant.DefaultBasePath,
+	Addr:      constant.DefaultStandAloneAddr,
+	Strategy:  consistenthash.New(),
+	Thrift:    false,
+	Transport: nil,
 }
 
 func NewOptions(opts ...Option) *Options {
@@ -43,8 +48,9 @@ func NewOptions(opts ...Option) *Options {
 		BasePath: defaultOptions.BasePath,
 		Addr:     defaultOptions.Addr,
 		// TODO: support more distributed strategy (will be supported)
-		Strategy: defaultOptions.Strategy,
-		Thrift:   defaultOptions.Thrift,
+		Strategy:  defaultOptions.Strategy,
+		Thrift:    defaultOptions.Thrift,
+		Transport: defaultOptions.Transport,
 	}
 	options.apply(opts...)
 	return options
@@ -73,5 +79,11 @@ func WithHostAddr(addr string) Option {
 func WithThrift0() Option {
 	return func(o *Options) {
 		o.Thrift = true
+	}
+}
+
+func WithTransport(tpt func(context.Context) http.RoundTripper) Option {
+	return func(o *Options) {
+		o.Transport = tpt
 	}
 }

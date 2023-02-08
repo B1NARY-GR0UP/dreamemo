@@ -35,7 +35,7 @@ import (
 var db = map[string]string{
 	"binary": "dreamemo",
 	"hello":  "world",
-	"foo":    "bar",
+	"ping":   "pong",
 }
 
 func getFromDB(_ context.Context, key string) ([]byte, error) {
@@ -49,7 +49,7 @@ func getFromDB(_ context.Context, key string) ([]byte, error) {
 // go run . --addrs=http://localhost:7246,http://localhost:7247,http://localhost:7248 --api
 // go run . --addrs=http://localhost:7247,http://localhost:7248,http://localhost:7246
 // go run . --addrs=http://localhost:7248,http://localhost:7246,http://localhost:7247
-// curl localhost:8080/hello?key=binary
+// curl localhost:8080/hello?key=ping
 func main() {
 	addrs, api := util.ParseFlags()
 	e := server.NewEngine(app.WithHostAddr(addrs[0]), app.WithThrift0())
