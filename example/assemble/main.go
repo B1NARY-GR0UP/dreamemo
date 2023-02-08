@@ -1,3 +1,18 @@
+// Copyright 2023 BINARY Members
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
 package main
 
 import (
@@ -31,6 +46,10 @@ func getFromDB(_ context.Context, key string) ([]byte, error) {
 	return nil, fmt.Errorf("key %v is not exist", key)
 }
 
+// go run . --addrs=http://localhost:7246,http://localhost:7247,http://localhost:7248 --api
+// go run . --addrs=http://localhost:7247,http://localhost:7248,http://localhost:7246
+// go run . --addrs=http://localhost:7248,http://localhost:7246,http://localhost:7247
+// curl localhost:8080/hello?key=binary
 func main() {
 	addrs, api := util.ParseFlags()
 	e := server.NewEngine(app.WithHostAddr(addrs[0]), app.WithThrift0())
