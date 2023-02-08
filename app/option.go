@@ -43,6 +43,7 @@ var defaultOptions = Options{
 	Transport: nil,
 }
 
+// NewOptions used for both server and client
 func NewOptions(opts ...Option) *Options {
 	options := &Options{
 		BasePath: defaultOptions.BasePath,
@@ -62,12 +63,14 @@ func (o *Options) apply(opts ...Option) {
 	}
 }
 
+// WithBasePath used to define base path of server
 func WithBasePath(path string) Option {
 	return func(o *Options) {
 		o.BasePath = path
 	}
 }
 
+// WithHostAddr used to define host addr server listens
 func WithHostAddr(addr string) Option {
 	addr = util.StandardizeAddr(addr)
 	return func(o *Options) {
@@ -82,6 +85,7 @@ func WithThrift0() Option {
 	}
 }
 
+// WithTransport define your own http transport
 func WithTransport(tpt func(context.Context) http.RoundTripper) Option {
 	return func(o *Options) {
 		o.Transport = tpt

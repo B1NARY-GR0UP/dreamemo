@@ -68,6 +68,7 @@ func (m *Memo) Remove(key eliminate.Key) {
 	m.memo.Remove(key)
 }
 
+// Clear memo entities
 func (m *Memo) Clear() {
 	m.Lock()
 	defer m.Unlock()

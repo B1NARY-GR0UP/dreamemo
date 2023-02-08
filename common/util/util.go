@@ -36,6 +36,7 @@ func ParseFlags() (addrs []string, api bool) {
 	return strings.Split(addrsFlag, ","), apiFlag
 }
 
+// CopyBytes copy bytes to a new []byte
 func CopyBytes(b []byte) []byte {
 	c := make([]byte, len(b))
 	copy(c, b)
@@ -63,6 +64,7 @@ func ParseRequestURL(reqPath, basePath string) []string {
 	return segments
 }
 
+// StandardizeAddr make addr standard
 func StandardizeAddr(addr string) string {
 	segments := strings.Split(addr, "://")
 	length := len(segments)

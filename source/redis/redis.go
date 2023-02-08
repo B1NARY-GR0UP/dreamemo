@@ -29,6 +29,7 @@ type Source struct {
 	cli *redis.Client
 }
 
+// NewSource return a redis source getter
 func NewSource(opts ...Option) *Source {
 	redisOpts := &redis.Options{
 		Addr:     ":6379",
@@ -44,6 +45,7 @@ func NewSource(opts ...Option) *Source {
 	}
 }
 
+// Get from redis source
 func (r *Source) Get(ctx context.Context, key string) ([]byte, error) {
 	return r.cli.Get(ctx, key).Bytes()
 }

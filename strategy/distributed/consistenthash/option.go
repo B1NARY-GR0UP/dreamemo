@@ -45,12 +45,14 @@ func (o *Options) apply(opts ...Option) {
 	}
 }
 
+// WithHashFunc define your hash function
 func WithHashFunc(hashFunc HashFunc) Option {
 	return func(o *Options) {
 		o.HashFunc = hashFunc
 	}
 }
 
+// WithReplicationFactor define consistent hash replication factor
 func WithReplicationFactor(factor int) Option {
 	return func(o *Options) {
 		o.ReplicationFactor = factor

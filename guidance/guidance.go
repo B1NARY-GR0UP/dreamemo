@@ -66,10 +66,12 @@ func GetGroup(name string) *Group {
 	return guidance.groups[name]
 }
 
+// Name return group name
 func (g *Group) Name() string {
 	return g.options.name
 }
 
+// Get guidance where to get value
 func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 	if key == "" {
 		return memo.ByteView{}, fmt.Errorf("key is null")

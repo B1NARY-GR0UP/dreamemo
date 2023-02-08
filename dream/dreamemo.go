@@ -17,11 +17,10 @@ package dream
 
 import (
 	"github.com/B1NARY-GR0UP/dreamemo/app"
-	"github.com/B1NARY-GR0UP/dreamemo/source"
-
 	"github.com/B1NARY-GR0UP/dreamemo/app/server"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/memo"
+	"github.com/B1NARY-GR0UP/dreamemo/source"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate/lru"
 )
 

@@ -47,6 +47,7 @@ type Engine struct {
 	clients   map[string]*client.Client
 }
 
+// NewEngine return a server engine
 func NewEngine(opts ...app.Option) *Engine {
 	options := app.NewOptions(opts...)
 	e := &Engine{

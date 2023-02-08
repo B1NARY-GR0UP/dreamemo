@@ -44,12 +44,14 @@ func (o *Options) apply(opts ...Option) {
 	}
 }
 
+// WithMaxSize define max size of core
 func WithMaxSize(size int) Option {
 	return func(o *Options) {
 		o.MaxSize = size
 	}
 }
 
+// WithEvictFunc define evict function execute when delete entity
 func WithEvictFunc(fn eliminate.EvictFunc) Option {
 	return func(o *Options) {
 		o.OnEvicted = fn
