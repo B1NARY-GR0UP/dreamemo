@@ -2,13 +2,13 @@
 
 > You Can (Not) Escape
 
-![dreamemo](./image/dreamemo.png)
+![dreamemo](images/dreamemo.png)
 
 DREAMEMO is a distributed cache with out-of-the-box, high-scalability, modular-design features.
 
 ## Architecture
 
-![dreamemo-arch](./image/dreamemo-arch.png)
+![dreamemo-arch](images/dreamemo-arch.png)
 
 ## Install
 
@@ -20,15 +20,15 @@ go get github.com/B1NARY-GR0UP/dreamemo
 
 ### Standalone
 
-[example](example/standalone/main.go)
+[example](examples/standalone/main.go)
 
 ### Cluster
 
-[example](example/cluster/main.go)
+[example](examples/cluster/main.go)
 
 ### Custom Assemble
 
-[example](example/assemble/main.go)
+[example](examples/assemble/main.go)
 
 ## End
 
