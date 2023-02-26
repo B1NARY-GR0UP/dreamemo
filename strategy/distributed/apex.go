@@ -16,7 +16,8 @@
 package distributed
 
 type Instance interface {
-	Add(nodes ...string)
-	Get(key string) string
+	Add(...string)
+	Get(string) string
+	Remove(string)
 	Name() string
 }

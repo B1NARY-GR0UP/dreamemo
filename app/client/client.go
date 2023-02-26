@@ -48,7 +48,7 @@ var defaultBufferPool = sync.Pool{
 	},
 }
 
-// Get from other instances
+// Get from other nodes
 func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.GetResponse) error {
 	requestURL := fmt.Sprintf("%v%v/%v", c.BasePath, url.QueryEscape(in.GetGroup()), url.QueryEscape(in.GetKey()))
 	req, err := http.NewRequest(HTTPRequestMethod, requestURL, nil)

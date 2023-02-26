@@ -19,7 +19,9 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/distributed"
+	"github.com/B1NARY-GR0UP/inquisitor/core"
 )
 
 var _ distributed.Instance = (*Hash)(nil)
@@ -58,7 +60,7 @@ func (h *Hash) Get(key string) string {
 	if len(h.nodes) == 0 {
 		return ""
 	}
-	// same key will get same hash so this ensures that a picked instance won't pick another instance
+	// same key will get same hash so this ensures that a picked node won't pick another node
 	hash := h.options.HashFunc([]byte(key))
 	idx := sort.Search(len(h.ring), func(i int) bool {
 		return h.ring[i] >= hash
@@ -67,6 +69,24 @@ func (h *Hash) Get(key string) string {
 		idx = 0
 	}
 	return h.nodes[h.ring[idx]]
+}
+
+func (h *Hash) Remove(key string) {
+	if key == "" {
+		core.Warn("---DREAMEMO--- Key should not be empty")
+		return
+	}
+	for i := 0; i < h.options.ReplicationFactor; i++ {
+		hash := h.options.HashFunc([]byte(fmt.Sprintf("%s%d", key, i)))
+		delete(h.nodes, hash)
+		idx := util.SearchUint32s(h.ring, hash)
+		if idx == -1 {
+			core.Error("---DREAMEMO--- Down node removed failed")
+			return
+		}
+		copy(h.ring[idx:], h.ring[idx+1:])
+		h.ring = h.ring[:len(h.ring)-1]
+	}
 }
 
 func (h *Hash) Name() string {

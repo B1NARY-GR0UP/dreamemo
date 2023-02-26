@@ -17,12 +17,15 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/B1NARY-GR0UP/dreamemo/app"
 	"github.com/B1NARY-GR0UP/dreamemo/app/client"
+	"github.com/B1NARY-GR0UP/dreamemo/common/constant"
 	"github.com/B1NARY-GR0UP/dreamemo/common/util"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
 	"github.com/B1NARY-GR0UP/dreamemo/loadbalance"
@@ -36,15 +39,15 @@ import (
 
 var _ loadbalance.LoadBalancer = (*Engine)(nil)
 
-// Engine server engine of each instance
+// Engine server engine of each node
 type Engine struct {
 	sync.Mutex
 	options *app.Options
-	// addr of local instance
-	self string
-	// an instance only holds its addr
-	instances distributed.Instance
-	clients   map[string]*client.Client
+	// addr of local node
+	self     string
+	strategy distributed.Instance
+	clients  map[string]*client.Client
+	nodeList []string
 }
 
 // NewEngine return a server engine
@@ -52,41 +55,47 @@ func NewEngine(opts ...app.Option) *Engine {
 	options := app.NewOptions(opts...)
 	e := &Engine{
 		// TODO: may cause bug, need secondly check
-		options:   options,
-		self:      options.Addr,
-		instances: options.Strategy,
+		options:  options,
+		self:     options.Addr,
+		strategy: options.Strategy,
 	}
 	return e
 }
 
 // Run is used to start cluster, should not be used in standalone mode
 func (e *Engine) Run() {
+	go func() {
+		time.Sleep(e.options.DetectDelay)
+		e.heartbeatDetect()
+	}()
 	core.Infof("---DREAMEMO--- Server is listening on %v", e.options.Addr)
+	core.Infof("---DREAMEMO--- Node list: %v", e.nodeList)
 	err := http.ListenAndServe(e.options.Addr, e)
 	if err != nil {
 		core.Errorf("---DREAMEMO--- Server started failed: %v", err)
 	}
 }
 
-// RegisterInstances instance should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
-func (e *Engine) RegisterInstances(insts ...string) {
+// RegisterNodes note should be a valid addr e.g. localhost:7246 localhost:7247 localhost:7248
+func (e *Engine) RegisterNodes(addrs ...string) {
 	e.Lock()
 	defer e.Unlock()
-	e.instances.Add(insts...)
-	e.clients = make(map[string]*client.Client, len(insts))
-	for _, instance := range insts {
-		e.clients[instance] = &client.Client{
+	e.strategy.Add(addrs...)
+	e.clients = make(map[string]*client.Client, len(addrs))
+	for _, addr := range addrs {
+		e.clients[addr] = &client.Client{
 			Options:  e.options,
-			BasePath: instance + e.options.BasePath,
+			BasePath: addr + e.options.BasePath,
 		}
+		e.nodeList = append(e.nodeList, addr)
 	}
 }
 
-// Pick an instance according to the given key
+// Pick a node according to the given key
 func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
 	e.Lock()
 	defer e.Unlock()
-	ins := e.instances.Get(key)
+	ins := e.strategy.Get(key)
 	if ins == "" {
 		return nil, false
 	}
@@ -98,6 +107,9 @@ func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
 
 // ServeHTTP implements the http.Handler interface
 func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if strings.HasSuffix(req.URL.Path, constant.DefaultHeartBeatDetectPath) {
+		return
+	}
 	segments := util.ParseRequestURL(req.URL.Path, e.options.BasePath)
 	if segments == nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -131,5 +143,30 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
 		_, _ = w.Write(body)
+	}
+}
+
+func (e *Engine) heartbeatDetect() {
+	defaultDetectPeriod := time.Second * 10
+	ticker := time.NewTicker(defaultDetectPeriod)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			core.Info("---DREAMEMO--- Heartbeat Detecting")
+			for i, addr := range e.nodeList {
+				resp, err := http.Get(fmt.Sprintf("%v%v", addr, constant.DefaultHeartBeatDetectPath))
+				if err != nil || resp.StatusCode != http.StatusOK {
+					core.Warnf("---DREAMEMO--- Node [addr: %v] is down", addr)
+					e.Lock()
+					e.strategy.Remove(addr)
+					delete(e.clients, addr)
+					copy(e.nodeList[i:], e.nodeList[i+1:])
+					e.nodeList = e.nodeList[:len(e.nodeList)-1]
+					e.Unlock()
+				}
+			}
+			// TODO: support graceful shutdown (will be supported)
+		}
 	}
 }

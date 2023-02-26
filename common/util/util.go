@@ -26,11 +26,11 @@ import (
 // --addrs=http://localhost:7246,http://localhost:7247,http://localhost:7248 --api
 // --addrs=http://localhost:7247,http://localhost:7248,http://localhost:7246
 // --addrs=http://localhost:7248,http://localhost:7246,http://localhost:7247
-// hint: first element is local instance
+// hint: first element is local node
 func ParseFlags() (addrs []string, api bool) {
 	var addrsFlag string
 	var apiFlag bool
-	flag.StringVar(&addrsFlag, "addrs", "", "instances addresses")
+	flag.StringVar(&addrsFlag, "addrs", "", "nodes addresses")
 	flag.BoolVar(&apiFlag, "api", false, "start api or not")
 	flag.Parse()
 	return strings.Split(addrsFlag, ","), apiFlag
@@ -75,4 +75,19 @@ func StandardizeAddr(addr string) string {
 		return segments[1]
 	}
 	return ""
+}
+
+func SearchUint32s(s []uint32, target uint32) int {
+	left, right := 0, len(s)-1
+	for left <= right {
+		mid := left + ((right - left) >> 1)
+		if s[mid] == target {
+			return mid
+		} else if s[mid] < target {
+			left = mid + 1
+		} else {
+			right = mid - 1
+		}
+	}
+	return -1
 }

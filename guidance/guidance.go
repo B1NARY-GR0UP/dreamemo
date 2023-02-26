@@ -86,9 +86,9 @@ func (g *Group) Get(ctx context.Context, key string) (memo.ByteView, error) {
 func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 	bv, err := g.sf.Do(key, func() (any, error) {
 		if g.engine != nil {
-			if ins, ok := g.engine.Pick(key); ok {
-				core.Info("---DREAMEMO--- Get from other instance")
-				value, err := g.getFromInstance(ctx, ins, key)
+			if node, ok := g.engine.Pick(key); ok {
+				core.Info("---DREAMEMO--- Get from other node")
+				value, err := g.getFromInstance(ctx, node, key)
 				if err != nil {
 					return memo.ByteView{}, err
 				}
@@ -117,14 +117,14 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 	return value, nil
 }
 
-func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instance, key string) (memo.ByteView, error) {
+func (g *Group) getFromInstance(ctx context.Context, node loadbalance.Instance, key string) (memo.ByteView, error) {
 	if g.options.thrift {
 		req := &thrift.GetRequest{
 			Group: g.options.name,
 			Key:   key,
 		}
 		resp := &thrift.GetResponse{}
-		err := instance.Get(ctx, req, resp)
+		err := node.Get(ctx, req, resp)
 		if err != nil {
 			return memo.ByteView{}, err
 		}
@@ -137,7 +137,7 @@ func (g *Group) getFromInstance(ctx context.Context, instance loadbalance.Instan
 			Key:   key,
 		}
 		resp := &protobuf.GetResponse{}
-		err := instance.Get(ctx, req, resp)
+		err := node.Get(ctx, req, resp)
 		if err != nil {
 			return memo.ByteView{}, err
 		}

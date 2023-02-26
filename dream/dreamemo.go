@@ -42,7 +42,7 @@ func StandAlone(getter source.Getter) {
 // distributed strategy => consistent hash
 func Cluster(getter source.Getter, addrs ...string) *server.Engine {
 	e := server.NewEngine(app.WithHostAddr(addrs[0]))
-	e.RegisterInstances(addrs...)
+	e.RegisterNodes(addrs...)
 	c := lru.NewLRUCore()
 	m := memo.NewMemo(c)
 	guidance.NewGroup(m, e, guidance.WithGetter(getter))

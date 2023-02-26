@@ -53,7 +53,7 @@ func getFromDB(_ context.Context, key string) ([]byte, error) {
 func main() {
 	addrs, api := util.ParseFlags()
 	e := server.NewEngine(app.WithHostAddr(addrs[0]), app.WithThrift0())
-	e.RegisterInstances(addrs...)
+	e.RegisterNodes(addrs...)
 	l := lfu.NewLFUCore()
 	m := memo.NewMemo(l)
 	guidance.NewGroup(m, e, guidance.WithGroupName("hello"), guidance.WithThrift1(), guidance.WithGetter(source.GetterFunc(getFromDB)))
