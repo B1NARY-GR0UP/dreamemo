@@ -119,7 +119,7 @@ func (c *Core) RemoveLowFrequency() {
 	delete(c.store, removedEntity.Key)
 	c.UsedSize--
 	if c.UsedSize < 0 {
-		core.Warn("UsedSize must greater than or equal to 0")
+		core.Error("---DREAMEMO--- UsedSize must greater than or equal to 0")
 	}
 	if c.OnEvicted != nil {
 		c.OnEvicted(removedEntity.Key, removedEntity.Value)

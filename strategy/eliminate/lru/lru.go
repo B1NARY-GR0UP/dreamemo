@@ -117,7 +117,7 @@ func (c *Core) removeElement(ele *list.Element) {
 	delete(c.store, entry.Key)
 	c.UsedSize--
 	if c.UsedSize < 0 {
-		core.Warn("UsedSize must greater than or equal to 0")
+		core.Error("---DREAMEMO--- UsedSize must greater than or equal to 0")
 	}
 	if c.OnEvicted != nil {
 		c.OnEvicted(entry.Key, entry.Value)
