@@ -23,18 +23,19 @@ import (
 
 var _ eliminate.ICore = (*Core)(nil)
 
+// Core is not safe under concurrent scene
 type Core struct {
 	eliminate.Core
-	store    map[eliminate.Key]Entity
-	entities Entities
+	store    map[eliminate.Key]entity
+	entities entities
 }
 
 type (
-	Entity struct {
+	entity struct {
 		eliminate.Entity
 		frequency int
 	}
-	Entities []Entity
+	entities []entity
 )
 
 // NewLFUCore will new a strategy object based on LFU algorithm
@@ -45,32 +46,32 @@ func NewLFUCore(opts ...Option) *Core {
 			MaxSize:   options.MaxSize,
 			OnEvicted: options.OnEvicted,
 		},
-		store:    make(map[eliminate.Key]Entity),
-		entities: make(Entities, 0),
+		store:    make(map[eliminate.Key]entity),
+		entities: make(entities, 0),
 	}
 }
 
 func (c *Core) Add(key eliminate.Key, value eliminate.Value) {
 	if c.store == nil {
-		c.store = make(map[eliminate.Key]Entity)
-		c.entities = make(Entities, 0)
+		c.store = make(map[eliminate.Key]entity)
+		c.entities = make(entities, 0)
 	}
 	if e, ok := c.store[key]; ok {
 		e.frequency++
 		e.Value = value
 		return
 	}
-	entity := Entity{
+	ent := entity{
 		Entity: eliminate.Entity{
 			Key:   key,
 			Value: value,
 		},
 		frequency: 1,
 	}
-	c.store[key] = entity
-	c.entities = append(c.entities, entity)
+	c.store[key] = ent
+	c.entities = append(c.entities, ent)
 	for c.MaxSize != 0 && c.MaxSize < c.UsedSize {
-		c.RemoveLowFrequency(key)
+		c.RemoveLowFrequency()
 	}
 }
 
@@ -107,14 +108,14 @@ func (c *Core) Remove(key eliminate.Key) {
 	}
 }
 
-func (c *Core) RemoveLowFrequency(key eliminate.Key) {
+func (c *Core) RemoveLowFrequency() {
 	if c.store == nil {
 		return
 	}
 	sort.Sort(c.entities)
 	removedEntity := c.entities[0]
 	c.entities = c.entities[1:]
-	delete(c.store, key)
+	delete(c.store, removedEntity.Key)
 	c.UsedSize--
 	if c.UsedSize < 0 {
 		panic("UsedSize must greater than or equal to 0")
@@ -139,14 +140,14 @@ func (c *Core) Name() string {
 	return "lfu"
 }
 
-func (e Entities) Len() int {
+func (e entities) Len() int {
 	return len(e)
 }
 
-func (e Entities) Less(i, j int) bool {
+func (e entities) Less(i, j int) bool {
 	return e[i].frequency < e[j].frequency
 }
 
-func (e Entities) Swap(i, j int) {
+func (e entities) Swap(i, j int) {
 	e[i], e[j] = e[j], e[i]
 }
