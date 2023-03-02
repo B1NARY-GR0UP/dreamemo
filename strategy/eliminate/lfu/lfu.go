@@ -19,6 +19,7 @@ import (
 	"sort"
 
 	"github.com/B1NARY-GR0UP/dreamemo/strategy/eliminate"
+	"github.com/B1NARY-GR0UP/inquisitor/core"
 )
 
 var _ eliminate.ICore = (*Core)(nil)
@@ -118,7 +119,7 @@ func (c *Core) RemoveLowFrequency() {
 	delete(c.store, removedEntity.Key)
 	c.UsedSize--
 	if c.UsedSize < 0 {
-		panic("UsedSize must greater than or equal to 0")
+		core.Warn("UsedSize must greater than or equal to 0")
 	}
 	if c.OnEvicted != nil {
 		c.OnEvicted(removedEntity.Key, removedEntity.Value)
