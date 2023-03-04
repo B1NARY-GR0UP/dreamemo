@@ -17,5 +17,5 @@ package dream
 
 const (
 	Name    = "DREAMEMO"
-	Version = "v0.1.1"
+	Version = "v0.1.2"
 )
