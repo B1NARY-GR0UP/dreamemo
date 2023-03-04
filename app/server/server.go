@@ -57,7 +57,7 @@ func NewEngine(opts ...app.Option) *Engine {
 		// TODO: may cause bug, need secondly check
 		options:    options,
 		self:       options.Addr,
-		dispatcher: options.Strategy,
+		dispatcher: options.Dispatcher,
 	}
 	return e
 }
