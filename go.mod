@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/B1NARY-GR0UP/inquisitor v0.1.0
-	github.com/B1NARY-GR0UP/piano v0.1.2
+	github.com/B1NARY-GR0UP/piano v0.1.3
 	github.com/apache/thrift v0.17.0
 	github.com/redis/go-redis/v9 v9.0.0-rc.4
 	google.golang.org/protobuf v1.28.1
