@@ -15,7 +15,8 @@
 
 package distributed
 
-type Instance interface {
+// Dispatcher is responsible for the maintenance and selection of nodes
+type Dispatcher interface {
 	Add(...string)
 	Get(string) string
 	Remove(string)

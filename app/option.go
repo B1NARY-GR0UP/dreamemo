@@ -31,7 +31,7 @@ type Option func(o *Options)
 type Options struct {
 	BasePath    string
 	Addr        string
-	Strategy    distributed.Instance
+	Strategy    distributed.Dispatcher
 	Thrift      bool
 	Transport   func(context.Context) http.RoundTripper
 	DetectDelay time.Duration

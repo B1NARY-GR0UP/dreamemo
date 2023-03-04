@@ -44,10 +44,10 @@ type Engine struct {
 	sync.Mutex
 	options *app.Options
 	// addr of local node
-	self     string
-	strategy distributed.Instance
-	clients  map[string]*client.Client
-	nodeList []string
+	self       string
+	dispatcher distributed.Dispatcher
+	clients    map[string]*client.Client
+	nodeList   []string
 }
 
 // NewEngine return a server engine
@@ -55,9 +55,9 @@ func NewEngine(opts ...app.Option) *Engine {
 	options := app.NewOptions(opts...)
 	e := &Engine{
 		// TODO: may cause bug, need secondly check
-		options:  options,
-		self:     options.Addr,
-		strategy: options.Strategy,
+		options:    options,
+		self:       options.Addr,
+		dispatcher: options.Strategy,
 	}
 	return e
 }
@@ -80,7 +80,7 @@ func (e *Engine) Run() {
 func (e *Engine) RegisterNodes(addrs ...string) {
 	e.Lock()
 	defer e.Unlock()
-	e.strategy.Add(addrs...)
+	e.dispatcher.Add(addrs...)
 	e.clients = make(map[string]*client.Client, len(addrs))
 	for _, addr := range addrs {
 		e.clients[addr] = &client.Client{
@@ -95,7 +95,7 @@ func (e *Engine) RegisterNodes(addrs ...string) {
 func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
 	e.Lock()
 	defer e.Unlock()
-	ins := e.strategy.Get(key)
+	ins := e.dispatcher.Get(key)
 	if ins == "" {
 		return nil, false
 	}
@@ -159,7 +159,7 @@ func (e *Engine) heartbeatDetect() {
 				if err != nil || resp.StatusCode != http.StatusOK {
 					core.Warnf("---DREAMEMO--- Node [addr: %v] is down", addr)
 					e.Lock()
-					e.strategy.Remove(addr)
+					e.dispatcher.Remove(addr)
 					delete(e.clients, addr)
 					copy(e.nodeList[i:], e.nodeList[i+1:])
 					e.nodeList = e.nodeList[:len(e.nodeList)-1]

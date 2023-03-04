@@ -24,7 +24,7 @@ import (
 	"github.com/B1NARY-GR0UP/inquisitor/core"
 )
 
-var _ distributed.Instance = (*Hash)(nil)
+var _ distributed.Dispatcher = (*Hash)(nil)
 
 type Hash struct {
 	ring    []uint32

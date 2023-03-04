@@ -88,7 +88,7 @@ func (g *Group) load(ctx context.Context, key string) (memo.ByteView, error) {
 		if g.engine != nil {
 			if node, ok := g.engine.Pick(key); ok {
 				core.Info("---DREAMEMO--- Get from other node")
-				value, err := g.getFromInstance(ctx, node, key)
+				value, err := g.getDistantly(ctx, node, key)
 				if err != nil {
 					return memo.ByteView{}, err
 				}
@@ -117,7 +117,7 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 	return value, nil
 }
 
-func (g *Group) getFromInstance(ctx context.Context, node loadbalance.Instance, key string) (memo.ByteView, error) {
+func (g *Group) getDistantly(ctx context.Context, node loadbalance.Instance, key string) (memo.ByteView, error) {
 	if g.options.thrift {
 		req := &thrift.GetRequest{
 			Group: g.options.name,
