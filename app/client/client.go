@@ -35,8 +35,6 @@ import (
 
 var _ loadbalance.Instance = (*Client)(nil)
 
-const HTTPRequestMethod = http.MethodGet
-
 type Client struct {
 	Options  *app.Options
 	BasePath string
@@ -51,7 +49,7 @@ var defaultBufferPool = sync.Pool{
 // Get from other nodes
 func (c *Client) Get(ctx context.Context, in protocol.GetRequest, out protocol.GetResponse) error {
 	requestURL := fmt.Sprintf("%v%v/%v", c.BasePath, url.QueryEscape(in.GetGroup()), url.QueryEscape(in.GetKey()))
-	req, err := http.NewRequest(HTTPRequestMethod, requestURL, nil)
+	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
 	if err != nil {
 		return err
 	}
