@@ -150,23 +150,19 @@ func (e *Engine) heartbeatDetect() {
 	defaultDetectPeriod := time.Second * 10
 	ticker := time.NewTicker(defaultDetectPeriod)
 	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			core.Info("---DREAMEMO--- Heartbeat Detecting")
-			for i, addr := range e.nodeList {
-				resp, err := http.Get(fmt.Sprintf("%v%v", addr, constant.DefaultHeartBeatDetectPath))
-				if err != nil || resp.StatusCode != http.StatusOK {
-					core.Warnf("---DREAMEMO--- Node [addr: %v] is down", addr)
-					e.Lock()
-					e.dispatcher.Remove(addr)
-					delete(e.clients, addr)
-					copy(e.nodeList[i:], e.nodeList[i+1:])
-					e.nodeList = e.nodeList[:len(e.nodeList)-1]
-					e.Unlock()
-				}
+	for range ticker.C {
+		core.Info("---DREAMEMO--- Heartbeat Detecting")
+		for i, addr := range e.nodeList {
+			resp, err := http.Get(fmt.Sprintf("%v%v", addr, constant.DefaultHeartBeatDetectPath))
+			if err != nil || resp.StatusCode != http.StatusOK {
+				core.Warnf("---DREAMEMO--- Node [addr: %v] is down", addr)
+				e.Lock()
+				e.dispatcher.Remove(addr)
+				delete(e.clients, addr)
+				copy(e.nodeList[i:], e.nodeList[i+1:])
+				e.nodeList = e.nodeList[:len(e.nodeList)-1]
+				e.Unlock()
 			}
-			// TODO: support graceful shutdown (will be supported)
 		}
 	}
 }
