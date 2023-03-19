@@ -33,7 +33,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var _ loadbalance.Instance = (*Client)(nil)
+var _ loadbalance.Node = (*Client)(nil)
 
 type Client struct {
 	Options  *app.Options

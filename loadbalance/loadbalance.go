@@ -22,9 +22,9 @@ import (
 )
 
 type LoadBalancer interface {
-	Pick(key string) (Instance, bool)
+	Pick(key string) (Node, bool)
 }
 
-type Instance interface {
+type Node interface {
 	Get(ctx context.Context, in protocol.GetRequest, out protocol.GetResponse) error
 }

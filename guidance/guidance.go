@@ -117,7 +117,7 @@ func (g *Group) getLocally(ctx context.Context, key string) (memo.ByteView, erro
 	return value, nil
 }
 
-func (g *Group) getDistantly(ctx context.Context, node loadbalance.Instance, key string) (memo.ByteView, error) {
+func (g *Group) getDistantly(ctx context.Context, node loadbalance.Node, key string) (memo.ByteView, error) {
 	if g.options.thrift {
 		req := &thrift.GetRequest{
 			Group: g.options.name,

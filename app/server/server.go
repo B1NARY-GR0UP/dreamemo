@@ -46,7 +46,7 @@ type Engine struct {
 	// addr of local node
 	self       string
 	dispatcher distributed.Dispatcher
-	clients    map[string]*client.Client
+	nodes      map[string]*client.Client
 	nodeList   []string
 }
 
@@ -81,9 +81,9 @@ func (e *Engine) RegisterNodes(addrs ...string) {
 	e.Lock()
 	defer e.Unlock()
 	e.dispatcher.Add(addrs...)
-	e.clients = make(map[string]*client.Client, len(addrs))
+	e.nodes = make(map[string]*client.Client, len(addrs))
 	for _, addr := range addrs {
-		e.clients[addr] = &client.Client{
+		e.nodes[addr] = &client.Client{
 			Options:  e.options,
 			BasePath: addr + e.options.BasePath,
 		}
@@ -92,15 +92,15 @@ func (e *Engine) RegisterNodes(addrs ...string) {
 }
 
 // Pick a node according to the given key
-func (e *Engine) Pick(key string) (loadbalance.Instance, bool) {
+func (e *Engine) Pick(key string) (loadbalance.Node, bool) {
 	e.Lock()
 	defer e.Unlock()
-	ins := e.dispatcher.Get(key)
-	if ins == "" {
+	addr := e.dispatcher.Get(key)
+	if addr == "" {
 		return nil, false
 	}
-	if !strings.Contains(ins, e.self) {
-		return e.clients[ins], true
+	if !strings.Contains(addr, e.self) {
+		return e.nodes[addr], true
 	}
 	return nil, false
 }
@@ -158,7 +158,7 @@ func (e *Engine) heartbeatDetect() {
 				core.Warnf("---DREAMEMO--- Node [addr: %v] is down", addr)
 				e.Lock()
 				e.dispatcher.Remove(addr)
-				delete(e.clients, addr)
+				delete(e.nodes, addr)
 				copy(e.nodeList[i:], e.nodeList[i+1:])
 				e.nodeList = e.nodeList[:len(e.nodeList)-1]
 				e.Unlock()
