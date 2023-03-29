@@ -1,5 +1,7 @@
 # DREAMEMO
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/B1NARY-GR0UP/dreamemo)](https://goreportcard.com/report/github.com/B1NARY-GR0UP/dreamemo)
+
 > You Can (Not) Escape
 
 ![dreamemo](images/dreamemo.png)
