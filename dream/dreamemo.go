@@ -16,6 +16,8 @@
 package dream
 
 import (
+	"fmt"
+
 	"github.com/B1NARY-GR0UP/dreamemo/app"
 	"github.com/B1NARY-GR0UP/dreamemo/app/server"
 	"github.com/B1NARY-GR0UP/dreamemo/guidance"
@@ -30,6 +32,7 @@ import (
 // eliminate strategy   => lru
 // distributed strategy => consistent hash
 func StandAlone(getter source.Getter) {
+	fmt.Printf(banner, Version)
 	c := lru.NewLRUCore()
 	m := memo.NewMemo(c)
 	guidance.NewGroup(m, nil, guidance.WithGetter(getter))
@@ -41,6 +44,7 @@ func StandAlone(getter source.Getter) {
 // eliminate strategy   => lru
 // distributed strategy => consistent hash
 func Cluster(getter source.Getter, addrs ...string) *server.Engine {
+	fmt.Printf(banner, Version)
 	e := server.NewEngine(app.WithHostAddr(addrs[0]))
 	e.RegisterNodes(addrs...)
 	c := lru.NewLRUCore()
