@@ -1,12 +1,8 @@
-# DREAMEMO
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/B1NARY-GR0UP/dreamemo)](https://goreportcard.com/report/github.com/B1NARY-GR0UP/dreamemo)
-
-> You Can (Not) Escape
-
 ![dreamemo](images/dreamemo.png)
 
 DREAMEMO is a distributed cache with out-of-the-box, high-scalability, modular-design features.
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/B1NARY-GR0UP/dreamemo)](https://goreportcard.com/report/github.com/B1NARY-GR0UP/dreamemo)
 
 ## Architecture
 
